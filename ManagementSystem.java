@@ -61,6 +61,14 @@ public class ManagementSystem {
         return restaurantIndex.get(restaurantID);  
     }
 
+     public void displayAllUsers() {
+        System.out.println("\n===== USER LIST =====");
+        for (User user : userList) {
+            System.out.println(user);
+            System.out.println();
+        }
+    }
+    
     public void displayAllRestaurants() {
         System.out.println("\nRestaurant List: ");
         for (Restaurant r : restaurantList) {
