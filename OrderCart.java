@@ -20,8 +20,7 @@ public class OrderCart {
         cart.push(item);
 
         System.out.println(
-                item.getFoodName() +
-                        " added to cart."
+                item.getFoodName() +" added to cart."
         );
     }
 

@@ -7,7 +7,7 @@ public class Restaurant {
     private String locationNode; 
     private String foodCategory;
     // For Person 3 to store the food items available at this restaurant
-    private List<OrderItem> menuItems;
+    private List<String> menuItems; 
 
     public Restaurant(String restaurantID, String restaurantName, String locationNode, String foodCategory) {
         this.restaurantID = restaurantID;
@@ -54,23 +54,10 @@ public class Restaurant {
         return menuItems; 
     }
     
-    public void addMenuItem(OrderItem item){
+    public void addMenuItem(String itemName) { 
         this.menuItems.add(itemName); 
     }
 
-    public void displayMenu() {
-        System.out.println("\n===== MENU =====");
-        if (menuItems.isEmpty()) {
-            System.out.println("No items available.");
-            return;
-        }
-
-        for (OrderItem item : menuItems) {
-            System.out.println(item);
-        }
-    }
-
-    
     @Override
     public String toString() {
         return "[Restaurant Profile]" +

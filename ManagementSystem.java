@@ -20,7 +20,7 @@ public class ManagementSystem {
     public void addRestaurant(Restaurant restaurant) {
         restaurantList.add(restaurant);
         restaurantIndex.put(restaurant.getRestaurantID(), restaurant); 
-        System.out.println("Restaurant '" + restaurant.getRestaurantName() + "' added successfully.");
+        //System.out.println("Restaurant '" + restaurant.getRestaurantName() + "' added successfully.");
     }
 
     public void removeRestaurant(String restaurantID) {
@@ -38,7 +38,7 @@ public class ManagementSystem {
     public void addUser(User user) {
         userList.add(user);
         userIndex.put(user.getUserID(),user);
-        System.out.println("User '" + user.getUserName() + "' added successfully.");
+        System.out.println("Welcome, " + user.getUserName() + "!");
     }
     
     public void removeUser(String userID) {
@@ -61,18 +61,10 @@ public class ManagementSystem {
         return restaurantIndex.get(restaurantID);  
     }
 
-     public void displayAllUsers() {
-        System.out.println("\n===== USER LIST =====");
-        for (User user : userList) {
-            System.out.println(user);
-            System.out.println();
-        }
-    }
-    
     public void displayAllRestaurants() {
         System.out.println("\nRestaurant List: ");
         for (Restaurant r : restaurantList) {
-            System.out.println(r.toString());
+            System.out.println(r.toString()+"\n-------------------");
         }
     }
 }
