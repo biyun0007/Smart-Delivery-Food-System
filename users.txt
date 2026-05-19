@@ -1,0 +1,7 @@
+U001,Ali Ahmad,0123456789,Node_B: KK12 Hostel
+U002,Chong Wei,0119876543,Node_D: Main Library
+U003,Saraswathi,0171112222,Node_E: DTC
+U004,XiaoWei,0193334444,Node_G: KL Gate
+U102,BiYun,011-9876543,Node_D: Main Library
+U103,JiaLe,017-1112222,Node_E: DTC
+
