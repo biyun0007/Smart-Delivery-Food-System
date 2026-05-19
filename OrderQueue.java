@@ -60,10 +60,7 @@ public class OrderQueue {
 
         if (activeOrders.isEmpty()) {
 
-            System.out.println(
-                    "No active orders."
-            );
-
+            System.out.println("No active orders.");
             return;
         }
 

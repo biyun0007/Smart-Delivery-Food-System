@@ -10,11 +10,7 @@ public class Order {
     private Restaurant restaurant;
     private List<OrderItem> items;
 
-    public Order(String orderID,
-                 User customer,
-                 Restaurant restaurant,
-                 List<OrderItem> items) {
-
+    public Order(String orderID,User customer,Restaurant restaurant,List<OrderItem> items) {
         this.orderID = orderID;
         this.customer = customer;
         this.restaurant = restaurant;

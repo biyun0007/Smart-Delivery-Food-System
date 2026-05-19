@@ -57,6 +57,7 @@ public class MainApplication {
 
         NavigationSystem nav = new NavigationSystem(myMap);
 
+        System.out.println("\n=== SMART FOOD DELIVERY SYSTEM (GoodTech) ===");
         //login/sign up process
         System.out.println("Please enter your user ID to log in(Sign up by default if not found):");
             String userID = scanner.next();
@@ -73,12 +74,12 @@ public class MainApplication {
             else{
                 System.out.println("Welcome back, " + managementSystem.getUser(userID).getUserName() + "!");
             }
-        System.out.println("\n=== SMART FOOD DELIVERY SYSTEM (GoodTech) ===");
         
         while (true) {
             System.out.println("\n--- MAIN MENU ---");
             System.out.println("1. Manage Users/Restaurants (Person 1)");
             System.out.println("2. Search & View Menu (Person 3)");
+            System.out.println("3. Search & View Menu (Person 3)");
             System.out.println("3. Place Order & Undo (Person 2)");
             System.out.println("4. Assign Delivery Rider (Person 4)");
             System.out.println("5. Calculate Delivery Route (Person 5)");
