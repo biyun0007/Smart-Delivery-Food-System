@@ -4,20 +4,26 @@ public class MainApplication {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         CityMap myMap = new CityMap();
-        
+
         // --- PERSON 1: Initialize Management System ---
         ManagementSystem managementSystem = new ManagementSystem();
-        
-        managementSystem.addRestaurant(new Restaurant("R001", "Pizza Place", "Mid Valley Megamall Food Court", "Italian"));
-        managementSystem.addRestaurant(new Restaurant("R002", "Sushi Spot", "Mid Valley Megamall Food Court", "Japanese"));
+
+        managementSystem
+                .addRestaurant(new Restaurant("R001", "Pizza Place", "Mid Valley Megamall Food Court", "Italian"));
+        managementSystem
+                .addRestaurant(new Restaurant("R002", "Sushi Spot", "Mid Valley Megamall Food Court", "Japanese"));
         managementSystem.addRestaurant(new Restaurant("R003", "Burger Joint", "KL Gateway Mall", "American"));
-        managementSystem.addRestaurant(new Restaurant("R004", "Taco Fiesta", "Mid Valley Megamall Food Court", "Mexican"));
+        managementSystem
+                .addRestaurant(new Restaurant("R004", "Taco Fiesta", "Mid Valley Megamall Food Court", "Mexican"));
         managementSystem.addRestaurant(new Restaurant("R005", "Pasta House", "KL Gateway Mall", "Italian"));
         managementSystem.addRestaurant(new Restaurant("R006", "Curry Corner", "KL Gateway Mall", "Indian"));
-        managementSystem.addRestaurant(new Restaurant("R007", "Salad Bar", "Mid Valley Megamall Food Court", "Healthy"));
-        managementSystem.addRestaurant(new Restaurant("R008", "Dessert Haven", "Mid Valley Megamall Food Court", "Desserts"));
+        managementSystem
+                .addRestaurant(new Restaurant("R007", "Salad Bar", "Mid Valley Megamall Food Court", "Healthy"));
+        managementSystem
+                .addRestaurant(new Restaurant("R008", "Dessert Haven", "Mid Valley Megamall Food Court", "Desserts"));
         managementSystem.addRestaurant(new Restaurant("R009", "KFC", "KFC University", "Fast Food"));
-        managementSystem.addRestaurant(new Restaurant("R010", "Vegan Delights", "Mid Valley Megamall Food Court", "Vegan"));    
+        managementSystem
+                .addRestaurant(new Restaurant("R010", "Vegan Delights", "Mid Valley Megamall Food Court", "Vegan"));
         managementSystem.addRestaurant(new Restaurant("R011", "Zus Coffee", "Zus Coffee University Malaya", "Cafe"));
 
         // --- PERSON 5: Setup the Map Data ---
@@ -33,11 +39,10 @@ public class MainApplication {
         myMap.addLocation("Zus Coffee University Malaya");
         myMap.addLocation("PJ Gate");
 
-
         myMap.addRoad("UM Central", "DTC", 0.8, true); // oneway
         myMap.addRoad("UM Central", "Faculty of Computer Science", 1.3, false); // Two-way
         myMap.addRoad("UM Central", "Main Library", 0.45, true); // oneway
-        myMap.addRoad("DTC", "KL Gate", 1.4, true); 
+        myMap.addRoad("DTC", "KL Gate", 1.4, true);
         myMap.addRoad("DTC", "KK12 Hostel", 0.9, true);
         myMap.addRoad("KK12 Hostel", "KL Gate", 1.0, true);
         myMap.addRoad("KK12 Hostel", "Faculty of Computer Science", 2.5, false);
@@ -57,24 +62,32 @@ public class MainApplication {
 
         NavigationSystem nav = new NavigationSystem(myMap);
 
-        //login/sign up process
+        // PERSON 4 : DELIVERY SCHEDULER SETUP
+
+        DeliveryScheduler scheduler = new DeliveryScheduler();
+
+        scheduler.registerRider(new Rider(101, "Ali", 2.0, 4.8));
+        scheduler.registerRider(new Rider(102, "Ben", 5.0, 4.5));
+        scheduler.registerRider(new Rider(103, "Chris", 1.5, 4.9));
+        scheduler.registerRider(new Rider(104, "Daniel", 3.2, 4.7));
+
+        // login/sign up process
         System.out.println("Please enter your user ID to log in(Sign up by default if not found):");
-            String userID = scanner.next();
-            if(managementSystem.getUser(userID)==null){ 
-                System.out.println("User not found. Creating new user profile...");
-                System.out.println("Please enter your name:");
-                String userName = scanner.next();
-                System.out.println("Please enter your phone number:");
-                String userPhoneNumber = scanner.next();
-                System.out.println("Please enter your location (e.g., UM Central, KL Gate):");
-                String userLocation = scanner.next();
-                managementSystem.addUser(new User(userID, userName, userPhoneNumber, userLocation));
-            }
-            else{
-                System.out.println("Welcome back, " + managementSystem.getUser(userID).getUserName() + "!");
-            }
+        String userID = scanner.next();
+        if (managementSystem.getUser(userID) == null) {
+            System.out.println("User not found. Creating new user profile...");
+            System.out.println("Please enter your name:");
+            String userName = scanner.next();
+            System.out.println("Please enter your phone number:");
+            String userPhoneNumber = scanner.next();
+            System.out.println("Please enter your location (e.g., UM Central, KL Gate):");
+            String userLocation = scanner.next();
+            managementSystem.addUser(new User(userID, userName, userPhoneNumber, userLocation));
+        } else {
+            System.out.println("Welcome back, " + managementSystem.getUser(userID).getUserName() + "!");
+        }
         System.out.println("\n=== SMART FOOD DELIVERY SYSTEM (GoodTech) ===");
-        
+
         while (true) {
             System.out.println("\n--- MAIN MENU ---");
             System.out.println("1. Manage Users/Restaurants (Person 1)");
@@ -84,14 +97,11 @@ public class MainApplication {
             System.out.println("5. Calculate Delivery Route (Person 5)");
             System.out.println("6. Exit");
             System.out.print("Enter choice: ");
-            
 
             int choice = scanner.nextInt();
 
             switch (choice) {
                 case 1:
-
-
                     managementSystem.displayAllRestaurants();
                     break;
                 case 2:
@@ -100,12 +110,25 @@ public class MainApplication {
                 case 3:
                     System.out.println("Calling Person 2's Order Queue & Stack...");
                     break;
+
+                // PERSON 4 : PRIORITY QUEUE DELIVERY ASSIGNMENT
+
                 case 4:
-                    System.out.println("Calling Person 4's Priority Queue Rider Match...");
+                    System.out.println("\n=== DELIVERY RIDER ASSIGNMENT ===");
+                    scheduler.displayAllRiders();
+                    scheduler.peekBestRider();
+                    System.out.println("\nAssigning Best Rider...");
+                    scheduler.assignBestRider();
                     break;
                 case 5:
                     nav.calculateShortestPath("Restaurant", "Customer");
                     break;
+                // scanner.nextLine();
+                // System.out.println("Enter Starting Location:");
+                // String start = scanner.nextLine();
+                // System.out.println("Enter Your Destination:");
+                // String end = scanner.nextLine();
+                // nav.calculateShortestPath(start, end);
                 case 6:
                     System.out.println("Exiting System. Goodbye!");
                     System.exit(0);
