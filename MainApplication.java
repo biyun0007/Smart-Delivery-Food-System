@@ -1,13 +1,14 @@
 import java.util.Scanner;
 
 public class MainApplication {
+
+    private static Scanner scanner = new Scanner(System.in);
+    private static CityMap myMap = new CityMap();
+    private static DeliveryScheduler scheduler = new DeliveryScheduler();
+    private static ManagementSystem managementSystem = new ManagementSystem();
     public static void main(String[] args) {
-        Scanner scanner = new Scanner(System.in);
-        CityMap myMap = new CityMap();
-        
         // --- PERSON 1: Initialize Management System ---
-        ManagementSystem managementSystem = new ManagementSystem();
-        
+
         managementSystem.addRestaurant(new Restaurant("R001", "Pizza Place", "Mid Valley Megamall Food Court", "Italian"));
         managementSystem.addRestaurant(new Restaurant("R002", "Sushi Spot", "Mid Valley Megamall Food Court", "Japanese"));
         managementSystem.addRestaurant(new Restaurant("R003", "Burger Joint", "KL Gateway Mall", "American"));
@@ -17,7 +18,7 @@ public class MainApplication {
         managementSystem.addRestaurant(new Restaurant("R007", "Salad Bar", "Mid Valley Megamall Food Court", "Healthy"));
         managementSystem.addRestaurant(new Restaurant("R008", "Dessert Haven", "Mid Valley Megamall Food Court", "Desserts"));
         managementSystem.addRestaurant(new Restaurant("R009", "KFC", "KFC University", "Fast Food"));
-        managementSystem.addRestaurant(new Restaurant("R010", "Vegan Delights", "Mid Valley Megamall Food Court", "Vegan"));    
+        managementSystem.addRestaurant(new Restaurant("R010", "Vegan Delights", "Mid Valley Megamall Food Court", "Vegan"));
         managementSystem.addRestaurant(new Restaurant("R011", "Zus Coffee", "Zus Coffee University Malaya", "Cafe"));
 
         // --- PERSON 5: Setup the Map Data ---
@@ -33,11 +34,10 @@ public class MainApplication {
         myMap.addLocation("Zus Coffee University Malaya");
         myMap.addLocation("PJ Gate");
 
-
         myMap.addRoad("UM Central", "DTC", 0.8, true); // oneway
         myMap.addRoad("UM Central", "Faculty of Computer Science", 1.3, false); // Two-way
         myMap.addRoad("UM Central", "Main Library", 0.45, true); // oneway
-        myMap.addRoad("DTC", "KL Gate", 1.4, true); 
+        myMap.addRoad("DTC", "KL Gate", 1.4, true);
         myMap.addRoad("DTC", "KK12 Hostel", 0.9, true);
         myMap.addRoad("KK12 Hostel", "KL Gate", 1.0, true);
         myMap.addRoad("KK12 Hostel", "Faculty of Computer Science", 2.5, false);
@@ -57,61 +57,113 @@ public class MainApplication {
 
         NavigationSystem nav = new NavigationSystem(myMap);
 
-        System.out.println("\n=== SMART FOOD DELIVERY SYSTEM (GoodTech) ===");
-        //login/sign up process
-        System.out.println("Please enter your user ID to log in(Sign up by default if not found):");
-            String userID = scanner.next();
-            if(managementSystem.getUser(userID)==null){ 
-                System.out.println("User not found. Creating new user profile...");
-                System.out.println("Please enter your name:");
-                String userName = scanner.next();
-                System.out.println("Please enter your phone number:");
-                String userPhoneNumber = scanner.next();
-                System.out.println("Please enter your location (e.g., UM Central, KL Gate):");
-                String userLocation = scanner.next();
-                managementSystem.addUser(new User(userID, userName, userPhoneNumber, userLocation));
-            }
-            else{
-                System.out.println("Welcome back, " + managementSystem.getUser(userID).getUserName() + "!");
-            }
+        System.out.println("WELCOME TO SMART FOOD DELIVERY SYSTEM (GoodTech) ");
+        System.out.println("Please select your portal to log in or sign up:");
+        System.out.println("1. Customer Portal (Order Food & Track Delivery)");
+        System.out.println("2. Restaurant Manager & Admin Portal");
+        System.out.println("3. Exit System");
+        System.out.print("Enter your choice (1-3): ");
+
+        int portalChoice = scanner.nextInt();
+        scanner.nextLine(); // Consume the newline
+
+        switch (portalChoice) {
+            case 1:
+                runCustomerPortal(scanner);
+                break;
+            case 2:
+                System.out.println("\n[Restaurant Manager/Admin Portal] Feature coming soon...");
+                break;
+            default:
+                System.out.println("Invalid choice!");
+        }
+    }
+
+    //Customer Portal
+    public static void runCustomerPortal(Scanner scanner) {
+        //login/sign up process as USER
+        System.out.print("Please enter your user ID to log in(Sign up by default if not found):");
+        String userID = scanner.next();
+        if(managementSystem.getUser(userID)==null){ 
+            System.out.println("User not found. Creating new user profile...");
+            System.out.print("Please enter your name:");
+            String userName = scanner.next();
+            System.out.print("Please enter your phone number:");
+            String userPhoneNumber = scanner.next();
+            System.out.print("Please enter your location (e.g., UM Central, KL Gate):");
+            String userLocation = scanner.nextLine();
+
+            String userPassword, confirmPassword;
+
+            do{
+                System.out.print("Create your password:");
+                userPassword = scanner.nextLine();
+                System.out.print("Confirm your password:");
+                confirmPassword = scanner.nextLine();
+                if (!userPassword.equals(confirmPassword)) {
+                    System.out.println("Passwords do not match. Please try again.");
+                } else {
+                    System.out.println("User '" + userName + "' created successfully. Welcome, " + userName + "!");
+                    break;
+                }
+            } while (true);
+
+            managementSystem.addUser(new User(userID, userName, userPhoneNumber, userLocation, userPassword));
+        }
+        else{ 
+            scanner.nextLine(); // Consume the newline
+            do{
+                System.out.print("Enter your password:");
+                String userPassword = scanner.nextLine();
+                if (userPassword.equals(managementSystem.getUser(userID).getUserPassword())) {
+                    System.out.println("Welcome back, " + managementSystem.getUser(userID).getUserName() + "!");
+                    break;
+                } else {
+                    System.out.println("Incorrect password. Please try again.");
+                    //scanner.nextLine(); // Consume the newline
+                }
+            } while (true);
+        }
+
+        String userLocation = managementSystem.getUser(userID).getUserAddressNode();
         
-        while (true) {
-            System.out.println("\n--- MAIN MENU ---");
-            System.out.println("1. Manage Users/Restaurants (Person 1)");
-            System.out.println("2. Search & View Menu (Person 3)");
-            System.out.println("3. Search & View Menu (Person 3)");
-            System.out.println("3. Place Order & Undo (Person 2)");
-            System.out.println("4. Assign Delivery Rider (Person 4)");
-            System.out.println("5. Calculate Delivery Route (Person 5)");
-            System.out.println("6. Exit");
-            System.out.print("Enter choice: ");
+        boolean inCustomerMenu = true;
+        while (inCustomerMenu) {
+            System.out.println("\n--- GOODTECH CUSTOMER PORTAL ---");
+            System.out.println("1. Browse & Search Restaurant Menus");
+            System.out.println("2. View Shopping Cart (Undo Last Item)");
+            System.out.println("3. Confirm Order & Checkout");
+            System.out.println("4. Track Active Order & Route Map");
+            System.out.println("5. Logout & Back");
+            System.out.print("Please select an option (1-5): ");
             
-
             int choice = scanner.nextInt();
-
+            scanner.nextLine(); // Clear buffer
+            
             switch (choice) {
                 case 1:
-
-
-                    managementSystem.displayAllRestaurants();
+                    System.out.println("\n[Person 3] Opening Food Menu Tree Search...");
+                    // menuSystem.searchFoodTree();
                     break;
                 case 2:
-                    System.out.println("Calling Person 3's AVL Tree Search...");
+                    System.out.println("\n[Person 2] Displaying Cart. Press 'U' to Undo...");
+                    // cartStack.displayAndManage();
                     break;
                 case 3:
-                    System.out.println("Calling Person 2's Order Queue & Stack...");
+                    System.out.println("\n[Person 2] Submitting order to Processing Queue...");
+                    // orderQueue.enqueue(newOrder);
+                    System.out.println("[System] Matching optimal rider and path...");
                     break;
                 case 4:
-                    System.out.println("Calling Person 4's Priority Queue Rider Match...");
+                    System.out.println("\n[Person 5] --- LIVE TRACKING ---");
+                    // navSystem.calculateShortestPath(currentRestaurantLocation, userLocation);
                     break;
                 case 5:
-                    nav.calculateShortestPath("Restaurant", "Customer");
+                    System.out.println("Logging out of customer session...");
+                    inCustomerMenu = false;
                     break;
-                case 6:
-                    System.out.println("Exiting System. Goodbye!");
-                    System.exit(0);
                 default:
-                    System.out.println("Invalid choice!");
+                    System.out.println("Invalid choice! Select 1-5.");
             }
         }
     }

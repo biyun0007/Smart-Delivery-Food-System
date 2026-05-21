@@ -3,12 +3,14 @@ public class User {
     private String userName;
     private String userPhoneNumber;
     private String userAddressNode; 
+    private String userPassword;
 
-    public User(String userID, String userName, String userPhoneNumber, String userAddressNode) {
+    public User(String userID, String userName, String userPhoneNumber, String userAddressNode,String userPassword) {
         this.userID = userID;
         this.userName = userName;
         this.userPhoneNumber = userPhoneNumber;
         this.userAddressNode = userAddressNode;
+        this.userPassword = userPassword;
     }
 
     public String getUserID() { 
@@ -42,6 +44,14 @@ public class User {
     public void setUserAddressNode(String userAddressNode) {
         this.userAddressNode = userAddressNode;
     }
+
+    public String getUserPassword() {
+        return userPassword;
+    }   
+
+    public void setUserPassword(String userPassword) {
+        this.userPassword = userPassword;
+    }   
 
     @Override
     public String toString() {
