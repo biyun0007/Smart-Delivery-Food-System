@@ -7,13 +7,13 @@ public class DeliveryScheduler {
     private PriorityQueue<Rider> riderQueue;
 
     // Constructor
-    public DeliveryScheduler() {
+    public DeliveryScheduler(String destination, NavigationSystem nav) {
         // Primary Sort: Shortest Distance (Ascending)
         // Secondary Sort (Tie-breaker): Highest Rating (Descending)
+        // Assuming you have 'destination' and 'nav' variables available in this scope:
         this.riderQueue = new PriorityQueue<>(
-            Comparator.comparingDouble(Rider::getCurrentDistance)
-                      .thenComparing((r1, r2) -> Double.compare(r2.getRating(), r1.getRating()))
-        );
+            Comparator.comparingDouble((Rider r) -> r.getCurrentDistance(destination, nav))
+                    .thenComparing((r1, r2) -> Double.compare(r2.getRating(), r1.getRating())));
     }
 
     // Register Rider into Priority Queue
@@ -53,15 +53,13 @@ public class DeliveryScheduler {
     }
 
     // Assign Best Rider
-    public void assignBestRider() {
+    public Rider assignBestRider() {
         if (riderQueue.isEmpty()) {
             System.out.println("No Riders Available For Assignment.\n");
-            return;
+            return null;
         }
 
         Rider assignedRider = riderQueue.poll(); // Removes the top of the Min-Heap
-        System.out.println("===== Rider Assigned Successfully =====");
-        System.out.println(assignedRider);
-        System.out.println();
+        return assignedRider;
     }
 }

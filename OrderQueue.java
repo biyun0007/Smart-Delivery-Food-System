@@ -10,21 +10,13 @@ public class OrderQueue {
     private Queue<Order> activeOrders;
 
     public OrderQueue() {
-
-        activeOrders =
-                new LinkedList<>();
+         activeOrders = new LinkedList<>();
     }
 
     // Add order to queue
     public void receiveOrder(Order order) {
-
         activeOrders.offer(order);
-
-        System.out.println(
-                "Order " +
-                        order.getOrderID() +
-                        " received."
-        );
+        System.out.println("Order " +order.getOrderID() +" received.");
     }
 
     // Process next order

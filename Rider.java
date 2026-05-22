@@ -1,20 +1,20 @@
 public class Rider {
 
-    private int riderID;
+    private String riderID;
     private String riderName;
-    private double currentDistance;
+    private String currentLocation;
     private double rating;
 
     // Constructor
-    public Rider(int riderID, String riderName, double currentDistance, double rating) {
+    public Rider(String riderID, String riderName, String currentLocation, double rating) {
         this.riderID = riderID;
         this.riderName = riderName;
-        this.currentDistance = currentDistance;
+        this.currentLocation = currentLocation;
         this.rating = rating;
     }
 
     // Getters
-    public int getRiderID() {
+    public String getRiderID() {
         return riderID;
     }
 
@@ -22,12 +22,40 @@ public class Rider {
         return riderName;
     }
 
-    public double getCurrentDistance() {
-        return currentDistance;
+    public String getCurrentLocation() {
+        return currentLocation;
     }
 
     public double getRating() {
         return rating;
+    }
+
+    public void setRiderID(String riderID) {
+        this.riderID = riderID;
+    }
+
+    public void setRiderName(String riderName) {
+        this.riderName = riderName;
+    }
+
+    public void setCurrentLocation(String currentLocation) {
+        this.currentLocation = currentLocation;
+    }
+
+    public void setRating(double rating) {
+        this.rating = rating;
+    }
+
+    public void updateLocation(String newLocation) {
+        this.currentLocation = newLocation;
+    }
+
+    public void updateRating(double newRating) {
+        this.rating = newRating;
+    }
+
+    public double getCurrentDistance(String destination, NavigationSystem nav) {
+        return nav.calculateShortestPath(currentLocation, destination);
     }
 
     // Display Rider Information
@@ -35,7 +63,7 @@ public class Rider {
     public String toString() {
         return "Rider ID: " + riderID +
                 " | Name: " + riderName +
-                " | Distance: " + currentDistance + " km" +
+                " | Location: " + currentLocation +
                 " | Rating: " + rating;
     }
 }

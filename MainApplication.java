@@ -1,11 +1,17 @@
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class MainApplication {
 
     private static Scanner scanner = new Scanner(System.in);
     private static CityMap myMap = new CityMap();
-    private static DeliveryScheduler scheduler = new DeliveryScheduler();
     private static ManagementSystem managementSystem = new ManagementSystem();
+    private static OrderCart cartStack = new OrderCart();
+    private static OrderQueue orderQueue = new OrderQueue();
+    private static NavigationSystem nav;
+    private static DeliveryScheduler deliveryScheduler;
+    private static List<Rider> systemRiders = new ArrayList<>();
     public static void main(String[] args) {
         // --- PERSON 1: Initialize Management System ---
 
@@ -55,8 +61,13 @@ public class MainApplication {
         myMap.addRoad("KL Gateway Mall", "KL Gate", 3.7, false);
         myMap.addRoad("PJ Gate", "KFC University", 1.0, false);
 
-        NavigationSystem nav = new NavigationSystem(myMap);
-
+        nav = new NavigationSystem(myMap);
+        
+        systemRiders.add(new Rider("R001","Rider_Amir", "KL Gate", 4.8));
+        systemRiders.add(new Rider("R002","Rider_Siti", "PJ Gate", 4.9));
+        systemRiders.add(new Rider("R003","Rider_Raju", "Main Library", 4.5));
+        systemRiders.add(new Rider("R004","Rider_Li", "Mid Valley Mega Mall", 4.7));
+        
         System.out.println("WELCOME TO SMART FOOD DELIVERY SYSTEM (GoodTech) ");
         System.out.println("Please select your portal to log in or sign up:");
         System.out.println("1. Customer Portal (Order Food & Track Delivery)");
@@ -125,45 +136,111 @@ public class MainApplication {
             } while (true);
         }
 
+        //check if user wants to change delivery location
         String userLocation = managementSystem.getUser(userID).getUserAddressNode();
-        
+        System.out.println("Delivery location set to: " + userLocation);
+        System.out.println("Change delivery location? (Y/N)");
+        String changeLocation = scanner.nextLine();
+        if (changeLocation.equalsIgnoreCase("Y")) {
+            System.out.print("Please enter your new delivery location:");
+            userLocation = scanner.nextLine();
+            managementSystem.getUser(userID).setUserAddressNode(userLocation);
+            System.out.println("Delivery location updated to: " + userLocation);
+        }
+
+        //menu for customer portal
+        String restaurantID=null;
         boolean inCustomerMenu = true;
         while (inCustomerMenu) {
             System.out.println("\n--- GOODTECH CUSTOMER PORTAL ---");
-            System.out.println("1. Browse & Search Restaurant Menus");
-            System.out.println("2. View Shopping Cart (Undo Last Item)");
-            System.out.println("3. Confirm Order & Checkout");
-            System.out.println("4. Track Active Order & Route Map");
-            System.out.println("5. Logout & Back");
-            System.out.print("Please select an option (1-5): ");
-            
+            System.out.println("1. Displaying all available restaurants");
+            System.out.println("2. Browse & Search Restaurant Menus");
+            System.out.println("3. Choose a Restaurant to Order From");
+            System.out.println("4. View Shopping Cart & Manage Orders");
+            System.out.println("5. Undo Last Item Added to Cart");
+            System.out.println("6. Confirm Order & Checkout");
+            System.out.println("7. Track Active Order & Route Map");
+            System.out.println("8. Logout & Back");
+            System.out.print("Please select an option (1-8): ");
+
             int choice = scanner.nextInt();
             scanner.nextLine(); // Clear buffer
             
             switch (choice) {
                 case 1:
+                    System.out.println("\n[Person 1] Displaying all restaurants...");
+                    managementSystem.displayAllRestaurants();
+                    break;
+                case 2:
                     System.out.println("\n[Person 3] Opening Food Menu Tree Search...");
                     // menuSystem.searchFoodTree();
                     break;
-                case 2:
-                    System.out.println("\n[Person 2] Displaying Cart. Press 'U' to Undo...");
-                    // cartStack.displayAndManage();
-                    break;
+
                 case 3:
-                    System.out.println("\n[Person 2] Submitting order to Processing Queue...");
-                    // orderQueue.enqueue(newOrder);
-                    System.out.println("[System] Matching optimal rider and path...");
+                    System.out.println("\n[Person 2] Please enter the Restaurant ID you want to order from:");
+                    restaurantID = scanner.next();
+                    Restaurant selectedRestaurant = managementSystem.getRestaurant(restaurantID);
+                    if (selectedRestaurant != null) {
+                        System.out.println("You have selected: " + selectedRestaurant.getRestaurantName());
+                        // cartStack.addToCart(selectedRestaurant);
+                        //display restaurant menu and allow user to add items to cart
+                    } else {
+                        System.out.println("Invalid Restaurant ID.");
+                    }
                     break;
                 case 4:
-                    System.out.println("\n[Person 5] --- LIVE TRACKING ---");
-                    // navSystem.calculateShortestPath(currentRestaurantLocation, userLocation);
+                    System.out.println("\n[Person 2] Displaying Cart.");
+                    cartStack.displayCart();
                     break;
                 case 5:
+                    System.out.println("\n[Person 2] Press 'U' to Undo...");
+                    cartStack.undoLastItem();
+                    break;
+                case 6:
+                    if (cartStack.isEmpty()) {
+                        System.out.println("Your cart is empty. Please add items before confirming your order.");
+                        break;             
+                    }
+                    //Ask user to confirm order before proceeding to checkout
+                    System.out.println("Are you sure you want to confirm your order? (Y/N)");
+                    String confirm = scanner.nextLine();
+                    if (confirm.equalsIgnoreCase("Y")) {
+                        System.out.println("\nSubmitting order to Processing Queue...");
+                        Order newOrder = new Order(userID,managementSystem.getUser(userID),
+                        managementSystem.getRestaurant(restaurantID), cartStack.confirmOrder());
+                        orderQueue.receiveOrder(newOrder);
+                        System.out.println("✅ Order confirmed and added to processing queue!");
+
+                        //Assign delivery rider and calculate delivery route
+                        System.out.println("[System] Matching optimal rider and path...");
+
+                        String restaurantLocNode = managementSystem.getRestaurant(restaurantID).getLocationNode();
+
+                        deliveryScheduler = new DeliveryScheduler(restaurantLocNode, nav);
+
+                        //Add all system riders to the delivery scheduler's priority queue
+                        for (Rider rider : systemRiders) {
+                            deliveryScheduler.registerRider(rider);
+                        }
+
+                        Rider assignedRider = deliveryScheduler.assignBestRider();
+                        
+                        if (assignedRider != null) {
+                            System.out.println("🛵 Successfully assigned " + assignedRider.getRiderName() + " to your order!");
+                        }
+                    }
+                    break;
+                case 7:
+                    System.out.println("\n[Person 5] --- LIVE TRACKING ---");
+                    nav.calculateShortestPath(managementSystem.getRestaurant(restaurantID).getLocationNode(), userLocation);
+                    nav.simulateDeliveryRoute(nav.finalRoute,myMap);
+                    break;
+                case 8:
                     System.out.println("Logging out of customer session...");
                     inCustomerMenu = false;
                     break;
                 default:
-                    System.out.println("Invalid choice! Select 1-5.");
+                    System.out.println("Invalid choice! Select 1-8.");
             }
         }
     }
