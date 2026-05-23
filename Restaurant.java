@@ -60,7 +60,7 @@ public class Restaurant {
 
     @Override
     public String toString() {
-        return "[Restaurant Profile]" +
+        return "\n[Restaurant Profile]" +
                "\nID      : " + restaurantID +
                "\nName    : " + restaurantName +
                "\nCategory: " + foodCategory +

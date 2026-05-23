@@ -61,9 +61,10 @@ public class Rider {
     // Display Rider Information
     @Override
     public String toString() {
-        return "Rider ID: " + riderID +
-                " | Name: " + riderName +
-                " | Location: " + currentLocation +
-                " | Rating: " + rating;
+        return "\n[Rider Profile]" +
+                "\nID      : " + riderID +
+                "\nName    : " + riderName +
+                "\nLocation: " + currentLocation +
+                "\nRating  : " + rating;
     }
 }

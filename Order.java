@@ -1,10 +1,6 @@
-// =========================
-// Order.java
-// =========================
 import java.util.List;
 
 public class Order {
-
     private String orderID;
     private User customer;
     private Restaurant restaurant;
@@ -35,20 +31,18 @@ public class Order {
 
     // Calculate total price
     public double calculateTotal() {
-
         double total = 0;
 
         for (OrderItem item : items) {
             total += item.getPrice();
         }
-
         return total;
     }
 
     @Override
     public String toString() {
 
-        return "\n===== ORDER =====" +
+        return "\n[Order Details]" +
                 "\nOrder ID   : " + orderID +
                 "\nCustomer   : " + customer.getUserName() +
                 "\nRestaurant : " + restaurant.getRestaurantName() +
