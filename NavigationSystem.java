@@ -70,9 +70,6 @@ public class NavigationSystem {
         return distances.get(end);
     }
 
-        
-
-
     public void simulateDeliveryRoute(NodeLinkedList<String> shortestPath, CityMap map) {
         if (shortestPath == null || shortestPath.isEmpty()) {
             System.out.println("Error! Invalid or empty route.");

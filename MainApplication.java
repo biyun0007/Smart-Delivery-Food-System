@@ -263,6 +263,7 @@ public class MainApplication {
                     }
                     break;
 
+
                 case 7:
                     if (restaurantID == null) {
                         System.out.println("No active order found. Please place an order first.");
