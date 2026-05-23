@@ -13,19 +13,6 @@ public class MainApplication {
     private static DeliveryScheduler deliveryScheduler;
     private static List<Rider> systemRiders = new ArrayList<>();
     public static void main(String[] args) {
-        // --- PERSON 1: Initialize Management System ---
-
-        managementSystem.addRestaurant(new Restaurant("R001", "Pizza Place", "Mid Valley Megamall Food Court", "Italian"));
-        managementSystem.addRestaurant(new Restaurant("R002", "Sushi Spot", "Mid Valley Megamall Food Court", "Japanese"));
-        managementSystem.addRestaurant(new Restaurant("R003", "Burger Joint", "KL Gateway Mall", "American"));
-        managementSystem.addRestaurant(new Restaurant("R004", "Taco Fiesta", "Mid Valley Megamall Food Court", "Mexican"));
-        managementSystem.addRestaurant(new Restaurant("R005", "Pasta House", "KL Gateway Mall", "Italian"));
-        managementSystem.addRestaurant(new Restaurant("R006", "Curry Corner", "KL Gateway Mall", "Indian"));
-        managementSystem.addRestaurant(new Restaurant("R007", "Salad Bar", "Mid Valley Megamall Food Court", "Healthy"));
-        managementSystem.addRestaurant(new Restaurant("R008", "Dessert Haven", "Mid Valley Megamall Food Court", "Desserts"));
-        managementSystem.addRestaurant(new Restaurant("R009", "KFC", "KFC University", "Fast Food"));
-        managementSystem.addRestaurant(new Restaurant("R010", "Vegan Delights", "Mid Valley Megamall Food Court", "Vegan"));
-        managementSystem.addRestaurant(new Restaurant("R011", "Zus Coffee", "Zus Coffee University Malaya", "Cafe"));
 
         // --- PERSON 5: Setup the Map Data ---
         myMap.addLocation("UM Central");
@@ -83,7 +70,7 @@ public class MainApplication {
                 runCustomerPortal(scanner);
                 break;
             case 2:
-                System.out.println("\n[Restaurant Manager/Admin Portal] Feature coming soon...");
+                runRestaurantPortal(scanner);
                 break;
             default:
                 System.out.println("Invalid choice!");
@@ -161,7 +148,8 @@ public class MainApplication {
             System.out.println("6. Confirm Order & Checkout");
             System.out.println("7. Track Active Order & Route Map");
             System.out.println("8. Logout & Back");
-            System.out.print("Please select an option (1-8): ");
+            System.out.println("9. Delete Account");
+            System.out.print("Please select an option (1-9): ");
 
             int choice = scanner.nextInt();
             scanner.nextLine(); // Clear buffer
@@ -238,6 +226,128 @@ public class MainApplication {
                 case 8:
                     System.out.println("Logging out of customer session...");
                     inCustomerMenu = false;
+                    break;
+                case 9:
+                    System.out.println("Are you sure you want to delete your account? This action cannot be undone. (Y/N)");
+                    String deleteConfirm = scanner.nextLine();  
+                    if (deleteConfirm.equalsIgnoreCase("Y")) {
+                        managementSystem.removeUser(userID);
+                        System.out.println("Your account has been deleted. Returning to main menu...");
+                        inCustomerMenu = false;
+                    }
+                default:
+                    System.out.println("Invalid choice! Select 1-9.");
+            }
+        }
+    }
+    public static void runRestaurantPortal(Scanner scanner) {
+        //login/sign up process as USER
+        System.out.print("Please enter your admin ID to log in: ");
+        String adminID = scanner.next();
+        if(managementSystem.getAdmin(adminID)==null){
+            System.out.println("Admin user not found. Please try again.");
+            return;
+        }
+        System.out.print("Enter your password: ");
+        String password = scanner.next();
+        if (! managementSystem.getAdmin(adminID).getAdminPassword().equals(password)) {
+            System.out.println("Incorrect password. Please try again.");
+            return;
+        } 
+        System.out.println("Admin " + managementSystem.getAdmin(adminID).getAdminName() + " logged in successfully.");
+
+        //restaurant manager/admin portal menu
+        boolean inAdminMenu = true;
+        while (inAdminMenu) {   
+            System.out.println("\n--- GOODTECH RESTAURANT MANAGER/ADMIN PORTAL ---");
+            System.out.println("1. Add New Restaurant");
+            System.out.println("2. Remove Existing Restaurant");
+            System.out.println("3. View All Restaurants");
+            System.out.println("4. Update Restaurant Information");
+            System.out.println("5. update Restaurant Menu");
+            System.out.println("6. Manage User Accounts");
+            System.out.println("7. Display All Admin Accounts");
+            System.out.println("8. Logout & Back");
+            System.out.print("Please select an option (1-8): ");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Clear buffer
+            
+            switch (choice) {
+                case 1:
+                    System.out.println("Adding new restaurant...");
+                    String newRestaurantId= "R" + String.format("%03d", managementSystem.getTotalRestaurants()+ 1);
+                    //prompt admin to enter restaurant details and add to management system
+                    System.out.print("Enter restaurant name:");
+                    String restaurantName = scanner.nextLine();
+                    System.out.print("Enter restaurant location:");
+                    String location = scanner.nextLine();
+                    System.out.print("Enter food category:");
+                    String foodCategory = scanner.nextLine();
+                    Restaurant newRestaurant = new Restaurant(newRestaurantId, restaurantName, location, foodCategory);
+                    managementSystem.addRestaurant(newRestaurant);
+                    break;
+                case 2:
+                    System.out.println("Removing a restaurant...");
+                    //prompt admin to enter restaurant ID and remove from management system
+                    System.out.print("Enter restaurant ID to remove:");
+                    String restaurantIdToRemove = scanner.nextLine();
+                    managementSystem.removeRestaurant(restaurantIdToRemove);
+                    break;
+                case 3:
+                    System.out.println("Displaying all restaurants...");
+                    managementSystem.displayAllRestaurants();
+                    break;
+                case 4:
+                    System.out.println("Updating restaurant information...");
+                    //prompt admin to enter restaurant ID and update details
+                    System.out.print("Enter restaurant ID to update:");
+                    String restaurantIdToUpdate = scanner.nextLine();
+                    Restaurant restaurantToUpdate = managementSystem.getRestaurant(restaurantIdToUpdate);
+                    if (restaurantToUpdate != null) {
+                        System.out.print("Enter new restaurant name:");
+                        String newRestaurantName = scanner.nextLine();
+                        System.out.print("Enter new restaurant location:");
+                        String newLocation = scanner.nextLine();
+                        System.out.print("Enter new food category:");
+                        String newFoodCategory = scanner.nextLine();
+                        restaurantToUpdate.setRestaurantName(newRestaurantName);
+                        restaurantToUpdate.setLocationNode(newLocation);
+                        restaurantToUpdate.setFoodCategory(newFoodCategory);
+                        System.out.println("Restaurant information updated successfully.");
+                    } else {
+                        System.out.println("Restaurant not found.");
+                    }
+                    break;
+                case 5:
+                    //[Person 3] Update restaurant menu
+                    System.out.println("Updating restaurant menu...");
+                    //prompt admin to enter restaurant ID and update menu
+                    System.out.print("Enter restaurant ID to update menu:");
+                    String restaurantIdToUpdateMenu = scanner.nextLine();
+                    Restaurant restaurantToUpdateMenu = managementSystem.getRestaurant(restaurantIdToUpdateMenu);
+                    if (restaurantToUpdateMenu != null) {
+                        System.out.print("Enter new menu item:");
+                        String newMenuItem = scanner.nextLine();
+                        restaurantToUpdateMenu.addMenuItem(newMenuItem);
+                        System.out.println("Menu item added successfully.");
+                    } else {
+                        System.out.println("Restaurant not found.");
+                    }
+                    break;
+                case 6:
+                    // Implement user account management logic here
+                    System.out.print("Remove user account by ID:");
+                    String userIdToRemove = scanner.nextLine();
+                    managementSystem.removeUser(userIdToRemove);
+                    break;
+                case 7:
+                    System.out.println("Displaying all admin accounts...");
+                    managementSystem.displayAllAdmins();
+                    break;
+                case 8:
+                    System.out.println("Logging out of admin session...");
+                    inAdminMenu = false;
                     break;
                 default:
                     System.out.println("Invalid choice! Select 1-8.");

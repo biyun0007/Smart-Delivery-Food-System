@@ -1,0 +1,11 @@
+R001,Pizza Place,Mid Valley Megamall Food Court,Italian
+R002,Sushi Spot,Mid Valley Megamall Food Court,Japanese
+R003,Burger Joint,KL Gateway Mall,American
+R004,Taco Fiesta,Mid Valley Megamall Food Court,Mexican
+R005,Pasta House,KL Gateway Mall,Italian
+R006,Curry Corner,KL Gateway Mall,Indian
+R007,Salad Bar,Mid Valley Megamall Food Court,Healthy
+R008,Dessert Haven,Mid Valley Megamall Food Court,Desserts
+R009,KFC,KFC University,Fast Food
+R010,Vegan Delights,Mid Valley Megamall Food Court,Vegan
+R011,Zus Coffee,Zus Coffee University Malaya,Cafe
