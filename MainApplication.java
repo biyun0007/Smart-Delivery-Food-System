@@ -142,7 +142,7 @@ public class MainApplication {
             System.out.println("\n--- GOODTECH CUSTOMER PORTAL ---");
             System.out.println("1. Displaying all available restaurants");
             System.out.println("2. Browse & Search Restaurant Menus");
-            System.out.println("3. Choose a Restaurant to Order From");
+            System.out.println("3. Choose a Restaurant to Order From and Add Items to Cart");
             System.out.println("4. View Shopping Cart & Manage Orders");
             System.out.println("5. Undo Last Item Added to Cart");
             System.out.println("6. Confirm Order & Checkout");
@@ -170,6 +170,7 @@ public class MainApplication {
                     Restaurant selectedRestaurant = managementSystem.getRestaurant(restaurantID);
                     if (selectedRestaurant != null) {
                         System.out.println("You have selected: " + selectedRestaurant.getRestaurantName());
+                        //add item to cart
                         // cartStack.addToCart(selectedRestaurant);
                         //display restaurant menu and allow user to add items to cart
                     } else {
