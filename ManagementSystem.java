@@ -16,9 +16,9 @@ public class ManagementSystem {
     private final String restaurantFile = "restaurants.txt";
 
     // Use HashMap for fast data retrieval
-    private HashMap<String,User> userIndex;
-    private HashMap<String,Restaurant> restaurantIndex;
-    private HashMap<String,Admin> adminIndex;
+    private HashMap<String, User> userIndex;
+    private HashMap<String, Restaurant> restaurantIndex;
+    private HashMap<String, Admin> adminIndex;
 
     public ManagementSystem() {
         this.userList = new LinkedList<>();
@@ -32,19 +32,20 @@ public class ManagementSystem {
         loadRestaurantsFromFile();
     }
 
-    //Restaurant Management
+    // Restaurant Management
     public void addRestaurant(Restaurant restaurant) {
         restaurantList.add(restaurant);
-        restaurantIndex.put(restaurant.getRestaurantID(), restaurant); 
-        System.out.println("Restaurant '" + restaurant.getRestaurantName() + "' with id " + restaurant.getRestaurantID() + " added successfully.");
+        restaurantIndex.put(restaurant.getRestaurantID(), restaurant);
+        System.out.println("Restaurant '" + restaurant.getRestaurantName() + "' with id " + restaurant.getRestaurantID()
+                + " added successfully.");
         saveRestaurantsToFile();
     }
 
     public void removeRestaurant(String restaurantID) {
         Restaurant res = restaurantIndex.get(restaurantID);
         if (res != null) {
-            restaurantList.remove(res); 
-            restaurantIndex.remove(restaurantID); 
+            restaurantList.remove(res);
+            restaurantIndex.remove(restaurantID);
             System.out.println("Restaurant ID " + restaurantID + " removed.");
         } else {
             System.out.println("Restaurant not found.");
@@ -52,12 +53,11 @@ public class ManagementSystem {
         saveRestaurantsToFile();
     }
 
-    //Restaurant management
+    // Restaurant management
     public Restaurant getRestaurant(String restaurantID) {
-        return restaurantIndex.get(restaurantID);  
+        return restaurantIndex.get(restaurantID);
     }
 
-    
     public int getTotalRestaurants() {
         return restaurantList.size();
     }
@@ -65,23 +65,23 @@ public class ManagementSystem {
     public void displayAllRestaurants() {
         System.out.println("\nRestaurant List: ");
         for (Restaurant r : restaurantList) {
-            System.out.println(r.toString()+"\n-------------------");
+            System.out.println(r.toString() + "\n-------------------");
         }
     }
 
-        //Load restaurants from text file
+    // Load restaurants from text file
     private void loadRestaurantsFromFile() {
         File file = new File(restaurantFile);
         if (!file.exists()) {
-            return; 
+            return;
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(restaurantFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (line.trim().isEmpty()) 
+                if (line.trim().isEmpty())
                     continue;
-                
+
                 String[] parts = line.split(",");
                 if (parts.length == 4) {
                     String restaurantId = parts[0].trim();
@@ -97,10 +97,12 @@ public class ManagementSystem {
             System.out.println("Error loading restaurants' information from file: " + e.getMessage());
         }
     }
+
     private void saveRestaurantsToFile() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(restaurantFile))) {
             for (Restaurant restaurant : restaurantList) {
-                writer.write(restaurant.getRestaurantID() + "," + restaurant.getRestaurantName() + "," + restaurant.getLocationNode() + "," + restaurant.getFoodCategory());
+                writer.write(restaurant.getRestaurantID() + "," + restaurant.getRestaurantName() + ","
+                        + restaurant.getLocationNode() + "," + restaurant.getFoodCategory());
                 writer.newLine();
             }
         } catch (IOException e) {
@@ -108,28 +110,29 @@ public class ManagementSystem {
         }
     }
 
-    //User Management
+    // User Management
     public void addUser(User user) {
         if (userIndex.containsKey(user.getUserID())) {
             System.out.println("User ID '" + user.getUserID() + "' already exists!");
-            return; 
+            return;
         }
 
         for (User existingUser : userList) {
             if (existingUser.getUserPhoneNumber().equals(user.getUserPhoneNumber())) {
-                System.out.println("Phone number '" + user.getUserPhoneNumber() + "' is already registered for user '" + existingUser.getUserName() + "'.");
-                return; 
+                System.out.println("Phone number '" + user.getUserPhoneNumber() + "' is already registered for user '"
+                        + existingUser.getUserName() + "'.");
+                return;
             }
         }
-  
-        //Add user if no duplication
+
+        // Add user if no duplication
         userList.add(user);
         userIndex.put(user.getUserID(), user);
         System.out.println("User '" + user.getUserName() + "' added successfully.");
 
         saveUsersToFile();
-}
-    
+    }
+
     public void removeUser(String userID) {
         User user = userIndex.get(userID);
         if (user != null) {
@@ -149,15 +152,16 @@ public class ManagementSystem {
     public void displayAllUsers() {
         System.out.println("\nUser List: ");
         for (User u : userList) {
-            System.out.println(u.toString()+"\n-------------------");
+            System.out.println(u.toString() + "\n-------------------");
         }
-    }   
+    }
 
     // Save all users currently into text file
     private void saveUsersToFile() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(userFile))) {
             for (User user : userList) {
-                writer.write(user.getUserID() + "," + user.getUserName() + "," + user.getUserPhoneNumber() + "," + user.getUserAddressNode());
+                writer.write(user.getUserID() + "," + user.getUserName() + "," + user.getUserPhoneNumber() + ","
+                        + user.getUserAddressNode() + "," + user.getUserPassword());
                 writer.newLine();
             }
         } catch (IOException e) {
@@ -165,19 +169,19 @@ public class ManagementSystem {
         }
     }
 
-    //Load users from text file
+    // Load users from text file
     private void loadUsersFromFile() {
         File file = new File(userFile);
         if (!file.exists()) {
-            return; 
+            return;
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(userFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (line.trim().isEmpty()) 
+                if (line.trim().isEmpty())
                     continue;
-                
+
                 String[] parts = line.split(",");
                 if (parts.length == 5) {
                     String id = parts[0].trim();
@@ -196,8 +200,7 @@ public class ManagementSystem {
         }
     }
 
-    
-    //admin management
+    // admin management
     public void addAdmin(Admin admin) {
         if (adminIndex.containsKey(admin.getAdminID())) {
             System.out.println("Admin ID '" + admin.getAdminID() + "' already exists!");
@@ -210,7 +213,7 @@ public class ManagementSystem {
 
         saveAdminsToFile();
     }
-    
+
     public void removeAdmin(String adminID) {
         Admin admin = adminIndex.get(adminID);
         if (admin != null) {
@@ -227,22 +230,22 @@ public class ManagementSystem {
         return adminIndex.get(adminID);
     }
 
-    //Load admins from text file
+    // Load admins from text file
     private void loadAdminsFromFile() {
         File file = new File(adminFile);
         if (!file.exists()) {
-            return; 
+            return;
         }
 
         try (BufferedReader reader = new BufferedReader(new FileReader(adminFile))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                if (line.trim().isEmpty()) 
+                if (line.trim().isEmpty())
                     continue;
-                
+
                 String[] parts = line.split(",");
                 if (parts.length == 3) {
-                    String adminId= parts[0].trim();
+                    String adminId = parts[0].trim();
                     String adminName = parts[1].trim();
                     String password = parts[2].trim();
                     Admin admin = new Admin(adminId, adminName, password);
@@ -254,6 +257,7 @@ public class ManagementSystem {
             System.out.println("Error loading admins' information from file: " + e.getMessage());
         }
     }
+
     private void saveAdminsToFile() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(adminFile))) {
             for (Admin admin : adminList) {
@@ -264,10 +268,11 @@ public class ManagementSystem {
             System.out.println("Error saving admins to text file: " + e.getMessage());
         }
     }
+
     public void displayAllAdmins() {
         System.out.println("\nAdmin List: ");
         for (Admin a : adminList) {
-            System.out.println(a.toString()+"\n-------------------");
+            System.out.println(a.toString() + "\n-------------------");
         }
     }
 }

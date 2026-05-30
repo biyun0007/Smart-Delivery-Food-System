@@ -12,6 +12,8 @@ public class MainApplication {
     private static NavigationSystem nav;
     private static DeliveryScheduler deliveryScheduler;
     private static List<Rider> systemRiders = new ArrayList<>();
+    private static MenuTree menuSystem = new MenuTree();
+
     public static void main(String[] args) {
         myMap.addLocation("UM Central");
         myMap.addLocation("KK12 Hostel");
@@ -47,57 +49,158 @@ public class MainApplication {
         myMap.addRoad("PJ Gate", "KFC University", 1.0, false);
 
         nav = new NavigationSystem(myMap);
-        
-        systemRiders.add(new Rider("R001","Rider_Amir", "KL Gate", 4.8));
-        systemRiders.add(new Rider("R002","Rider_Siti", "PJ Gate", 4.9));
-        systemRiders.add(new Rider("R003","Rider_Raju", "Main Library", 4.5));
-        systemRiders.add(new Rider("R004","Rider_Li", "Mid Valley Mega Mall", 4.7));
-        
-        System.out.println("WELCOME TO GOOD TECH SMART FOOD DELIVERY SYSTEM");
-        System.out.println("Please select your portal to log in or sign up:");
-        System.out.println("1. Customer Portal (Order Food & Track Delivery)");
-        System.out.println("2. Restaurant Manager & Admin Portal");
-        System.out.println("3. Exit System");
-        System.out.print("Enter your choice (1-3): ");
 
-        int portalChoice = scanner.nextInt();
-        scanner.nextLine(); // Consume the newline
+        systemRiders.add(new Rider("R001", "Rider_Amir", "KL Gate", 4.8));
+        systemRiders.add(new Rider("R002", "Rider_Siti", "PJ Gate", 4.9));
+        systemRiders.add(new Rider("R003", "Rider_Raju", "Main Library", 4.5));
+        systemRiders.add(new Rider("R004", "Rider_Li", "Mid Valley Mega Mall", 4.7));
 
-        switch (portalChoice) {
-            case 1:
-                runCustomerPortal(scanner);
-                break;
-            case 2:
-                runRestaurantPortal(scanner);
-                break;
-            case 3:
-                System.out.println("Exiting system. Goodbye!");
-                scanner.close();
-                System.exit(0);
-                break;
-            default:
-                System.out.println("Invalid choice!");
+        // Pre-load food menu items — inserted out of order to demonstrate AVL Tree
+        // sorting
+        Restaurant r001 = managementSystem.getRestaurant("R001");
+        if (r001 != null) {
+            r001.addMenuItem(new FoodItem("R001", "Pepperoni Pizza", 14.90, "Italian"));
+            r001.addMenuItem(new FoodItem("R001", "Garlic Bread", 5.90, "Italian"));
+            r001.addMenuItem(new FoodItem("R001", "Tiramisu", 8.90, "Italian"));
+            r001.addMenuItem(new FoodItem("R001", "Margherita Pizza", 12.90, "Italian"));
+            r001.addMenuItem(new FoodItem("R001", "BBQ Chicken Pizza", 15.90, "Italian"));
         }
-        System.out.println();
+        Restaurant r002 = managementSystem.getRestaurant("R002");
+        if (r002 != null) {
+            r002.addMenuItem(new FoodItem("R002", "Tuna Roll", 12.90, "Japanese"));
+            r002.addMenuItem(new FoodItem("R002", "Gyoza", 8.90, "Japanese"));
+            r002.addMenuItem(new FoodItem("R002", "Salmon Sushi", 15.90, "Japanese"));
+            r002.addMenuItem(new FoodItem("R002", "Matcha Ice Cream", 7.90, "Japanese"));
+            r002.addMenuItem(new FoodItem("R002", "Miso Soup", 5.90, "Japanese"));
+        }
+        Restaurant r003 = managementSystem.getRestaurant("R003");
+        if (r003 != null) {
+            r003.addMenuItem(new FoodItem("R003", "Onion Rings", 6.90, "American"));
+            r003.addMenuItem(new FoodItem("R003", "Beef Burger", 13.90, "American"));
+            r003.addMenuItem(new FoodItem("R003", "French Fries", 5.90, "American"));
+            r003.addMenuItem(new FoodItem("R003", "Cheese Burger", 14.90, "American"));
+            r003.addMenuItem(new FoodItem("R003", "Chicken Burger", 12.90, "American"));
+        }
+        Restaurant r004 = managementSystem.getRestaurant("R004");
+        if (r004 != null) {
+            r004.addMenuItem(new FoodItem("R004", "Quesadilla", 10.90, "Mexican"));
+            r004.addMenuItem(new FoodItem("R004", "Beef Taco", 11.90, "Mexican"));
+            r004.addMenuItem(new FoodItem("R004", "Nachos", 8.90, "Mexican"));
+            r004.addMenuItem(new FoodItem("R004", "Churros", 6.90, "Mexican"));
+            r004.addMenuItem(new FoodItem("R004", "Chicken Burrito", 13.90, "Mexican"));
+        }
+        Restaurant r005 = managementSystem.getRestaurant("R005");
+        if (r005 != null) {
+            r005.addMenuItem(new FoodItem("R005", "Lasagna", 15.90, "Italian"));
+            r005.addMenuItem(new FoodItem("R005", "Aglio Olio", 13.90, "Italian"));
+            r005.addMenuItem(new FoodItem("R005", "Penne Arrabbiata", 12.90, "Italian"));
+            r005.addMenuItem(new FoodItem("R005", "Bruschetta", 7.90, "Italian"));
+            r005.addMenuItem(new FoodItem("R005", "Carbonara", 14.90, "Italian"));
+        }
+        Restaurant r006 = managementSystem.getRestaurant("R006");
+        if (r006 != null) {
+            r006.addMenuItem(new FoodItem("R006", "Mango Lassi", 5.90, "Indian"));
+            r006.addMenuItem(new FoodItem("R006", "Garlic Naan", 3.90, "Indian"));
+            r006.addMenuItem(new FoodItem("R006", "Chicken Briyani", 14.90, "Indian"));
+            r006.addMenuItem(new FoodItem("R006", "Dal Tadka", 9.90, "Indian"));
+            r006.addMenuItem(new FoodItem("R006", "Butter Chicken", 13.90, "Indian"));
+        }
+        Restaurant r007 = managementSystem.getRestaurant("R007");
+        if (r007 != null) {
+            r007.addMenuItem(new FoodItem("R007", "Smoothie", 7.90, "Healthy"));
+            r007.addMenuItem(new FoodItem("R007", "Greek Salad", 11.90, "Healthy"));
+            r007.addMenuItem(new FoodItem("R007", "Grilled Chicken Bowl", 14.90, "Healthy"));
+            r007.addMenuItem(new FoodItem("R007", "Caesar Salad", 12.90, "Healthy"));
+            r007.addMenuItem(new FoodItem("R007", "Quinoa Bowl", 13.90, "Healthy"));
+        }
+        Restaurant r008 = managementSystem.getRestaurant("R008");
+        if (r008 != null) {
+            r008.addMenuItem(new FoodItem("R008", "Waffles", 10.90, "Desserts"));
+            r008.addMenuItem(new FoodItem("R008", "Chocolate Lava Cake", 9.90, "Desserts"));
+            r008.addMenuItem(new FoodItem("R008", "Macarons", 6.90, "Desserts"));
+            r008.addMenuItem(new FoodItem("R008", "Crepe", 8.90, "Desserts"));
+            r008.addMenuItem(new FoodItem("R008", "Ice Cream Sundae", 7.90, "Desserts"));
+        }
+        Restaurant r009 = managementSystem.getRestaurant("R009");
+        if (r009 != null) {
+            r009.addMenuItem(new FoodItem("R009", "Zinger Burger", 13.90, "Fast Food"));
+            r009.addMenuItem(new FoodItem("R009", "Coleslaw", 4.90, "Fast Food"));
+            r009.addMenuItem(new FoodItem("R009", "Spicy Chicken", 12.90, "Fast Food"));
+            r009.addMenuItem(new FoodItem("R009", "Mashed Potato", 5.90, "Fast Food"));
+            r009.addMenuItem(new FoodItem("R009", "Original Fried Chicken", 11.90, "Fast Food"));
+        }
+        Restaurant r010 = managementSystem.getRestaurant("R010");
+        if (r010 != null) {
+            r010.addMenuItem(new FoodItem("R010", "Tofu Stir Fry", 10.90, "Vegan"));
+            r010.addMenuItem(new FoodItem("R010", "Acai Bowl", 13.90, "Vegan"));
+            r010.addMenuItem(new FoodItem("R010", "Veggie Wrap", 9.90, "Vegan"));
+            r010.addMenuItem(new FoodItem("R010", "Mushroom Burger", 12.90, "Vegan"));
+            r010.addMenuItem(new FoodItem("R010", "Avocado Toast", 11.90, "Vegan"));
+        }
+        Restaurant r011 = managementSystem.getRestaurant("R011");
+        if (r011 != null) {
+            r011.addMenuItem(new FoodItem("R011", "Zus Cold Brew", 10.90, "Cafe"));
+            r011.addMenuItem(new FoodItem("R011", "Americano", 7.90, "Cafe"));
+            r011.addMenuItem(new FoodItem("R011", "Matcha Latte", 9.90, "Cafe"));
+            r011.addMenuItem(new FoodItem("R011", "Croissant", 6.90, "Cafe"));
+            r011.addMenuItem(new FoodItem("R011", "Caramel Latte", 9.90, "Cafe"));
+        }
+
+        // Keeps returning to portal selection after each logout
+        boolean running = true;
+        while (running) {
+            System.out.println("\nWELCOME TO GOOD TECH SMART FOOD DELIVERY SYSTEM");
+            System.out.println("Please select your portal to log in or sign up:");
+            System.out.println("1. Customer Portal (Order Food & Track Delivery)");
+            System.out.println("2. Restaurant Manager & Admin Portal");
+            System.out.println("3. Exit System");
+            System.out.print("Enter your choice (1-3): ");
+
+            if (!scanner.hasNextInt()) {
+                System.out.println("Invalid input!");
+                scanner.nextLine();
+                continue;
+            }
+
+            int portalChoice = scanner.nextInt();
+            scanner.nextLine();
+
+            switch (portalChoice) {
+                case 1:
+                    runCustomerPortal(scanner);
+                    break;
+                case 2:
+                    runRestaurantPortal(scanner);
+                    break;
+                case 3:
+                    System.out.println("Exiting system. Goodbye!");
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Invalid choice! Enter 1, 2, or 3.");
+            }
+        }
+        scanner.close();
     }
 
-    //Customer Portal
+    // Customer Portal
     public static void runCustomerPortal(Scanner scanner) {
-        //login/sign up process as USER
+        // login/sign up process as USER
         System.out.print("Please enter your user ID to log in / Sign up by default if not found):");
         String userID = scanner.next();
-        if(managementSystem.getUser(userID)==null){ 
+        if (managementSystem.getUser(userID) == null) {
             System.out.println("User not found. Creating new user profile...");
             System.out.print("Please enter your name: ");
             String userName = scanner.next();
             System.out.print("Please enter your phone number: ");
             String userPhoneNumber = scanner.next();
+            scanner.nextLine();
             System.out.print("Please enter your location (e.g., UM Central, KL Gate): ");
             String userLocation = scanner.nextLine();
 
             String userPassword, confirmPassword;
 
-            do{
+            do {
                 System.out.print("Create your password: ");
                 userPassword = scanner.nextLine();
                 System.out.print("Confirm your password: ");
@@ -111,9 +214,9 @@ public class MainApplication {
             } while (true);
             managementSystem.addUser(new User(userID, userName, userPhoneNumber, userLocation, userPassword));
 
-        } else{ 
+        } else {
             scanner.nextLine(); // Consume the newline
-            do{
+            do {
                 System.out.print("Enter your password:");
                 String userPassword = scanner.nextLine();
                 if (userPassword.equals(managementSystem.getUser(userID).getUserPassword())) {
@@ -121,12 +224,12 @@ public class MainApplication {
                     break;
                 } else {
                     System.out.println("Incorrect password. Please try again.");
-                    //scanner.nextLine(); // Consume the newline
+                    // scanner.nextLine(); // Consume the newline
                 }
             } while (true);
         }
 
-        //check if user wants to change delivery location
+        // check if user wants to change delivery location
         String userLocation = managementSystem.getUser(userID).getUserAddressNode();
         System.out.println("Delivery location set to: " + userLocation);
         System.out.println("Change delivery location?(Y/N): ");
@@ -138,8 +241,8 @@ public class MainApplication {
             System.out.println("Delivery location updated to: " + userLocation);
         }
 
-        //menu for customer portal
-        String restaurantID=null;
+        // menu for customer portal
+        String restaurantID = null;
         boolean inCustomerMenu = true;
 
         while (inCustomerMenu) {
@@ -156,14 +259,14 @@ public class MainApplication {
             System.out.print("Please select an option (1-9): ");
 
             if (!scanner.hasNextInt()) {
-            System.out.println("Invalid input! Please enter a number.");
-            scanner.nextLine(); 
-            continue;
+                System.out.println("Invalid input! Please enter a number.");
+                scanner.nextLine();
+                continue;
             }
 
             int choice = scanner.nextInt();
             scanner.nextLine();
-            
+
             switch (choice) {
                 case 1:
                     System.out.println("\nDisplaying all restaurants...");
@@ -171,14 +274,46 @@ public class MainApplication {
                     break;
 
                 case 2:
-                    System.out.println("\nOpening Food Menu Tree Search...");
-                    // menuSystem.searchFoodTree();
+                    System.out.print("\nEnter Restaurant ID to browse menu: ");
+                    String menuRestID = scanner.nextLine().trim().toUpperCase();
+                    Restaurant menuRest = managementSystem.getRestaurant(menuRestID);
+
+                    if (menuRest == null) {
+                        System.out.println("Restaurant not found.");
+                        break;
+                    }
+                    if (menuRest.getMenuItems().isEmpty()) {
+                        System.out.println("This restaurant has no menu items yet.");
+                        break;
+                    }
+
+                    menuSystem.loadFromRestaurant(menuRest);
+
+                    System.out.println("1. Display sorted menu (A-Z)");
+                    System.out.println("2. Search food by name");
+                    System.out.print("Select option: ");
+                    int menuChoice = scanner.nextInt();
+                    scanner.nextLine();
+
+                    if (menuChoice == 1) {
+                        menuSystem.displaySortedMenu();
+                    } else if (menuChoice == 2) {
+                        System.out.print("Enter food name to search: ");
+                        String searchName = scanner.nextLine().trim();
+                        FoodItem found = menuSystem.searchByName(searchName);
+                        if (found != null) {
+                            System.out.println("\nItem found:");
+                            System.out.println("  " + found.toString());
+                        } else {
+                            System.out.println("\"" + searchName + "\" not found in this menu.");
+                        }
+                    }
                     break;
 
                 case 3:
                     System.out.print("\nPlease enter the Restaurant ID you want to order from: ");
                     String chosenID = scanner.nextLine().trim();
-            
+
                     Restaurant selectedRestaurant = managementSystem.getRestaurant(chosenID);
                     if (selectedRestaurant != null) {
                         // If user switches restaurants, clear the previous cart
@@ -187,19 +322,20 @@ public class MainApplication {
                             System.out.print("Do you want to clear the previous cart and start a new order? (Y/N): ");
                             String confirmClear = scanner.nextLine().trim();
                             if (confirmClear.equalsIgnoreCase("Y")) {
-                                while (!cartStack.isEmpty()) { 
-                                    cartStack.undoLastItem(); 
-                                }   
-                                restaurantID = chosenID; 
-                                System.out.println("Cart cleared. Switched to: " + selectedRestaurant.getRestaurantName());
+                                while (!cartStack.isEmpty()) {
+                                    cartStack.undoLastItem();
+                                }
+                                restaurantID = chosenID;
+                                System.out.println(
+                                        "Cart cleared. Switched to: " + selectedRestaurant.getRestaurantName());
                             } else {
                                 System.out.println("Returning to main menu without changing restaurant.");
-                                break; 
+                                break;
                             }
                         } else {
                             restaurantID = chosenID;
                             System.out.println("You have selected: " + selectedRestaurant.getRestaurantName());
-                        }             
+                        }
                     } else {
                         System.out.println("Invalid Restaurant ID.");
                     }
@@ -217,7 +353,7 @@ public class MainApplication {
                         System.out.print("Are you sure you want to remove the last added item? (Y/N): ");
                         String confirmUndo = scanner.nextLine().trim();
                         if (confirmUndo.equalsIgnoreCase("Y")) {
-                            cartStack.undoLastItem(); 
+                            cartStack.undoLastItem();
                         } else {
                             System.out.println("Undo cancelled.");
                         }
@@ -227,7 +363,7 @@ public class MainApplication {
                 case 6:
                     if (cartStack.isEmpty() || restaurantID == null) {
                         System.out.println("Your cart is empty. Please add items before confirming your order.");
-                        break;             
+                        break;
                     }
 
                     System.out.println("Are you sure you want to confirm your order? (Y/N): ");
@@ -235,34 +371,34 @@ public class MainApplication {
                     if (confirm.equalsIgnoreCase("Y")) {
                         System.out.println("\nSubmitting order to Processing Queue...");
 
-                        Order newOrder = new Order(userID,managementSystem.getUser(userID),
-                        managementSystem.getRestaurant(restaurantID), cartStack.confirmOrder());
+                        Order newOrder = new Order(userID, managementSystem.getUser(userID),
+                                managementSystem.getRestaurant(restaurantID), cartStack.confirmOrder());
 
                         orderQueue.receiveOrder(newOrder);
                         System.out.println("Order confirmed and added to processing queue!");
 
-                        //Assign delivery rider and calculate delivery route
+                        // Assign delivery rider and calculate delivery route
                         System.out.println("Matching optimal rider and path...");
 
                         String restaurantLocNode = managementSystem.getRestaurant(restaurantID).getLocationNode();
 
                         deliveryScheduler = new DeliveryScheduler(restaurantLocNode, nav);
 
-                        //Add all system riders to the delivery scheduler's priority queue
+                        // Add all system riders to the delivery scheduler's priority queue
                         for (Rider rider : systemRiders) {
                             deliveryScheduler.registerRider(rider);
                         }
 
                         Rider assignedRider = deliveryScheduler.assignBestRider();
-                        
+
                         if (assignedRider != null) {
-                            System.out.println("Successfully assigned " + assignedRider.getRiderName() + " to your order!");
+                            System.out.println(
+                                    "Successfully assigned " + assignedRider.getRiderName() + " to your order!");
                         }
                     } else {
                         System.out.println("Checkout cancelled. Returning to main menu.");
                     }
                     break;
-
 
                 case 7:
                     if (restaurantID == null) {
@@ -277,12 +413,12 @@ public class MainApplication {
                     }
 
                     System.out.println("\n--- LIVE TRACKING ---");
-                    nav.calculateShortestPath(managementSystem.getRestaurant(restaurantID).getLocationNode(), userLocation);
-                    nav.simulateDeliveryRoute(nav.finalRoute,myMap);
-                    
-                    restaurantID = null; 
-                    break;
+                    nav.calculateShortestPath(managementSystem.getRestaurant(restaurantID).getLocationNode(),
+                            userLocation);
+                    nav.simulateDeliveryRoute(nav.finalRoute, myMap);
 
+                    restaurantID = null;
+                    break;
 
                 case 8:
                     System.out.println("Logging out of customer session...");
@@ -290,7 +426,8 @@ public class MainApplication {
                     break;
 
                 case 9:
-                    System.out.println("Are you sure you want to delete your account? This action cannot be undone. (Y/N): ");
+                    System.out.println(
+                            "Are you sure you want to delete your account? This action cannot be undone. (Y/N): ");
                     String deleteConfirm = scanner.nextLine().trim();
                     if (deleteConfirm.equalsIgnoreCase("Y")) {
                         managementSystem.removeUser(userID);
@@ -310,21 +447,21 @@ public class MainApplication {
     public static void runRestaurantPortal(Scanner scanner) {
         System.out.print("Please enter your admin ID to log in: ");
         String adminID = scanner.next();
-        if(managementSystem.getAdmin(adminID)==null){
+        if (managementSystem.getAdmin(adminID) == null) {
             System.out.println("Admin ID " + adminID + " not found. Please try again.");
             return;
         }
         System.out.print("Enter your password: ");
         String password = scanner.next();
 
-        if (! managementSystem.getAdmin(adminID).getAdminPassword().equals(password)) {
+        if (!managementSystem.getAdmin(adminID).getAdminPassword().equals(password)) {
             System.out.println("Incorrect password. Please try again.");
             return;
-        } 
+        }
         System.out.println("Admin " + managementSystem.getAdmin(adminID).getAdminName() + " logged in successfully.");
 
         boolean inAdminMenu = true;
-        while (inAdminMenu) {   
+        while (inAdminMenu) {
             System.out.println("\n--- GOODTECH RESTAURANT MANAGER/ADMIN PORTAL ---");
             System.out.println("1. Add New Restaurant");
             System.out.println("2. Remove Existing Restaurant");
@@ -337,20 +474,20 @@ public class MainApplication {
             System.out.print("Please select an option (1-8): ");
 
             if (!scanner.hasNextInt()) {
-            System.out.println("Invalid input! Please enter a number.");
-            scanner.nextLine(); 
-            continue;
+                System.out.println("Invalid input! Please enter a number.");
+                scanner.nextLine();
+                continue;
             }
 
             int choice = scanner.nextInt();
-            scanner.nextLine(); 
-            
+            scanner.nextLine();
+
             switch (choice) {
                 case 1:
                     System.out.println("Adding new restaurant...");
                     int counter = managementSystem.getTotalRestaurants() + 1;
                     String newRestaurantId;
-                    do { 
+                    do {
                         newRestaurantId = "R" + String.format("%03d", counter++);
                     } while (managementSystem.getRestaurant(newRestaurantId) != null);
 
@@ -363,9 +500,10 @@ public class MainApplication {
 
                     Restaurant newRestaurant = new Restaurant(newRestaurantId, restaurantName, location, foodCategory);
                     managementSystem.addRestaurant(newRestaurant);
-                    System.out.println("Successfully registered restaurant " + restaurantName + " with ID: " + newRestaurantId);
+                    System.out.println(
+                            "Successfully registered restaurant " + restaurantName + " with ID: " + newRestaurantId);
                     break;
-                    
+
                 case 2:
                     System.out.println("Removing a restaurant...");
 
@@ -378,7 +516,7 @@ public class MainApplication {
                         System.out.println("Restaurant " + restaurantIdToRemove + " removed successfully.");
                     } else {
                         System.out.println("Restaurant ID " + restaurantIdToRemove + " not found.");
-                    }   
+                    }
                     break;
 
                 case 3:
@@ -395,11 +533,13 @@ public class MainApplication {
                     if (restaurantToUpdate != null) {
                         System.out.print("Enter new name (Current: " + restaurantToUpdate.getRestaurantName() + "): ");
                         String newRestaurantName = scanner.nextLine().trim();
-                        System.out.print("Enter new map node (Current: " + restaurantToUpdate.getLocationNode() + "): ");
+                        System.out
+                                .print("Enter new map node (Current: " + restaurantToUpdate.getLocationNode() + "): ");
                         String newLocation = scanner.nextLine().trim();
-                        System.out.print("Enter new category (Current: " + restaurantToUpdate.getFoodCategory() + "): ");
+                        System.out
+                                .print("Enter new category (Current: " + restaurantToUpdate.getFoodCategory() + "): ");
                         String newFoodCategory = scanner.nextLine().trim();
-                    
+
                         restaurantToUpdate.setRestaurantName(newRestaurantName);
                         restaurantToUpdate.setLocationNode(newLocation);
                         restaurantToUpdate.setFoodCategory(newFoodCategory);
@@ -419,7 +559,7 @@ public class MainApplication {
                     if (restaurantToUpdateMenu != null) {
                         System.out.print("Enter new food item name: ");
                         String itemName = scanner.nextLine().trim();
-                    
+
                         System.out.print("Enter price for " + itemName + ": ");
                         while (!scanner.hasNextDouble()) {
                             System.out.print("Invalid price number! Try again: ");
@@ -428,9 +568,11 @@ public class MainApplication {
                         double itemPrice = scanner.nextDouble();
                         scanner.nextLine();
 
-                        FoodItem newDish = new FoodItem(restaurantIdToUpdateMenu, itemName, itemPrice, restaurantToUpdateMenu.getFoodCategory());
+                        FoodItem newDish = new FoodItem(restaurantIdToUpdateMenu, itemName, itemPrice,
+                                restaurantToUpdateMenu.getFoodCategory());
                         restaurantToUpdateMenu.addMenuItem(newDish);
-                        System.out.println("'" + itemName + "' (RM " + itemPrice + ") successfully added to " + restaurantToUpdateMenu.getRestaurantName() + "'s menu.");
+                        System.out.println("'" + itemName + "' (RM " + itemPrice + ") successfully added to "
+                                + restaurantToUpdateMenu.getRestaurantName() + "'s menu.");
                     } else {
                         System.out.println("Restaurant not found.");
                     }
