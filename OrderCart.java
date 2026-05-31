@@ -53,6 +53,14 @@ public class OrderCart {
         }
     }
 
+    public double calculateTotal() {
+        double total = 0;
+        for (OrderItem item : cart) {
+            total += item.getPrice();
+        }
+        return total;
+    }
+
     public boolean isEmpty() {
         return cart.isEmpty();
     }

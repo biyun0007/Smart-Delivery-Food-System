@@ -1,4 +1,11 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.PriorityQueue;
 
 public class DeliveryScheduler {
@@ -6,25 +13,88 @@ public class DeliveryScheduler {
     // Priority Queue using Min Heap
     private PriorityQueue<Rider> riderQueue;
 
-    // Constructor
+    // Persistent master registry list holding riders loaded from your text file database
+    private List<Rider> registeredRiders = new ArrayList<>();
+
+    private final String riderFile = "rider.txt"; // File to persist rider data
+
+    // Default Constructor
+    // Used in MainApplication at system boot to initialize the database without a context
+    public DeliveryScheduler() {
+        loadRidersFromFile(); // Populate the registeredRiders list from the text file
+    }
+
+    // Constructor 2 
+    // Used at active order checkout cycles to instantly compute structural proximity priorities
     public DeliveryScheduler(String destination, NavigationSystem nav) {
         // Primary Sort: Shortest Distance (Ascending)
         // Secondary Sort (Tie-breaker): Highest Rating (Descending)
-        // Assuming you have 'destination' and 'nav' variables available in this scope:
         this.riderQueue = new PriorityQueue<>(
             Comparator.comparingDouble((Rider r) -> r.getCurrentDistance(destination, nav))
                     .thenComparing((r1, r2) -> Double.compare(r2.getRating(), r1.getRating())));
     }
 
-    // Register Rider into Priority Queue
+    // Added Public Getter for Registered Riders List 
+    // Allows MainApplication to grab the master roster and feed it into a checkout queue
+    public List<Rider> getRegisteredRiders() {
+        return registeredRiders;
+    }
+
+    public void loadRidersFromFile() {
+        try (BufferedReader br = new BufferedReader(new FileReader(riderFile))) {
+            String line;
+            
+            while ((line = br.readLine()) != null) {
+                if (line.trim().isEmpty()) continue; // Skip blank lines
+                
+                String[] tokens = line.split(",");
+                
+                String id = tokens[0].trim(); 
+                String name = tokens[1].trim();
+                String location = tokens[2].trim();
+                double rating = Double.parseDouble(tokens[3].trim());
+                
+                // Add the freshly parsed rider directly to this scheduler's master list
+                this.registeredRiders.add(new Rider(id, name, location, rating));
+            }
+           
+        } catch (IOException e) {
+            System.out.println("Error loading riders file: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("Data formatting mismatch inside riders.txt: " + e.getMessage());
+        }
+    }
+
+    //Saves the current state of registered riders back to the text file, ensuring persistence across sessions
+    public void saveRidersToFile() {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(riderFile))) {
+            for (Rider rider : registeredRiders) {
+                String line = String.format("%s,%s,%s,%.1f", 
+                                rider.getRiderID(), 
+                                rider.getRiderName(), 
+                                rider.getCurrentLocation(), 
+                                rider.getRating());
+                bw.write(line);
+                bw.newLine();
+            }
+            
+        } catch (IOException e) {
+            System.out.println("Error saving riders to file: " + e.getMessage());
+        }
+    }
+    
+    // Register Rider Tool
     public void registerRider(Rider rider) {
-        riderQueue.offer(rider);
-        System.out.println("Rider Registered Successfully: " + rider.getRiderName());
+        if (riderQueue != null) {
+            riderQueue.offer(rider); // Feed the active sorting heap if one exists
+        } else {
+            registeredRiders.add(rider); // Fallback: add to base master storage database
+        }
     }
 
     // Display All Riders in true Priority Order (Corrected for-each loop bug)
     public void displayAllRiders() {
-        if (riderQueue.isEmpty()) {
+        if (riderQueue == null || riderQueue.isEmpty()) {
             System.out.println("No Riders Available.\n");
             return;
         }
@@ -43,7 +113,7 @@ public class DeliveryScheduler {
 
     // View Best Rider Without Removing
     public void peekBestRider() {
-        if (riderQueue.isEmpty()) {
+        if (riderQueue == null || riderQueue.isEmpty()) {
             System.out.println("No Riders Available.\n");
             return;
         }
@@ -54,12 +124,24 @@ public class DeliveryScheduler {
 
     // Assign Best Rider
     public Rider assignBestRider() {
-        if (riderQueue.isEmpty()) {
+        if (riderQueue == null || riderQueue.isEmpty()) {
             System.out.println("No Riders Available For Assignment.\n");
             return null;
         }
 
         Rider assignedRider = riderQueue.poll(); // Removes the top of the Min-Heap
         return assignedRider;
+    }
+
+    public void populateQueueWithRiders(List<Rider> masterRiders) {
+        if (this.riderQueue == null) {
+            System.out.println("Error: Queue is not initialized with a location context!");
+            return;
+        }
+        
+        for (Rider r : masterRiders) {
+            // Use .offer() directly on the heap array to bypass traffic-cop branches
+            this.riderQueue.offer(r);
+        }
     }
 }

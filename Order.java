@@ -6,8 +6,8 @@ public class Order {
     private Restaurant restaurant;
     private List<OrderItem> items;
 
-    public Order(String orderID,User customer,Restaurant restaurant,List<OrderItem> items) {
-        this.orderID = orderID;
+    public Order(User customer,Restaurant restaurant,List<OrderItem> items) {
+        this.orderID = "ORD" + System.currentTimeMillis(); // Simple unique ID generation
         this.customer = customer;
         this.restaurant = restaurant;
         this.items = items;

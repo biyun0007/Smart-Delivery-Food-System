@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -10,8 +9,7 @@ public class MainApplication {
     private static OrderCart cartStack = new OrderCart();
     private static OrderQueue orderQueue = new OrderQueue();
     private static NavigationSystem nav;
-    private static DeliveryScheduler deliveryScheduler;
-    private static List<Rider> systemRiders = new ArrayList<>();
+    private static DeliveryScheduler deliveryScheduler = new DeliveryScheduler();
     private static MenuTree menuSystem = new MenuTree();
 
     public static void main(String[] args) {
@@ -49,11 +47,8 @@ public class MainApplication {
         myMap.addRoad("PJ Gate", "KFC University", 1.0, false);
 
         nav = new NavigationSystem(myMap);
-
-        systemRiders.add(new Rider("R001", "Rider_Amir", "KL Gate", 4.8));
-        systemRiders.add(new Rider("R002", "Rider_Siti", "PJ Gate", 4.9));
-        systemRiders.add(new Rider("R003", "Rider_Raju", "Main Library", 4.5));
-        systemRiders.add(new Rider("R004", "Rider_Li", "Mid Valley Mega Mall", 4.7));
+        
+        
 
         // Pre-load food menu items — inserted out of order to demonstrate AVL Tree
         // sorting
@@ -250,15 +245,14 @@ public class MainApplication {
         while (inCustomerMenu) {
             System.out.println("\n--- GOODTECH CUSTOMER PORTAL ---");
             System.out.println("1. Displaying all available restaurants");
-            System.out.println("2. Browse & Search Restaurant Menu");
-            System.out.println("3. Choose a Restaurant to Order From");
-            System.out.println("4. View Shopping Cart & Manage Orders");
-            System.out.println("5. Undo Last Item Added to Cart");
-            System.out.println("6. Confirm Order & Checkout");
-            System.out.println("7. Track Active Order & Route Map");
-            System.out.println("8. Logout & Back");
-            System.out.println("9. Delete Account");
-            System.out.print("Please select an option (1-9): ");
+            System.out.println("2. Search Food or Restaurant by Name/ID and add items to Cart");
+            System.out.println("3. View Shopping Cart & Manage Orders");
+            System.out.println("4. Undo Last Item Added to Cart");
+            System.out.println("5. Confirm Order & Checkout");
+            System.out.println("6. Track Active Order & Route Map");
+            System.out.println("7. Logout & Back");
+            System.out.println("8. Delete Account");
+            System.out.print("Please select an option (1-8): ");
 
             if (!scanner.hasNextInt()) {
                 System.out.println("Invalid input! Please enter a number.");
@@ -275,80 +269,162 @@ public class MainApplication {
                     managementSystem.displayAllRestaurants();
                     break;
 
-                case 2:
-                    System.out.print("\nEnter Restaurant ID to browse menu: ");
-                    String menuRestID = scanner.nextLine().trim().toUpperCase();
-                    Restaurant menuRest = managementSystem.getRestaurant(menuRestID);
+               case 2:
+                    System.out.print("\nEnter Restaurant Name, Location, or Cuisine keyword: ");
+                    String searchTerm = scanner.nextLine().trim();
 
-                    if (menuRest == null) {
-                        System.out.println("Restaurant not found.");
+                    // 1. Get and store all partial keyword matches from the database
+                    List<Restaurant> matches = managementSystem.searchRestaurantsByKeyword(searchTerm);
+
+                    if (matches.isEmpty()) {
+                        System.out.println("No restaurants found matching \"" + searchTerm + "\".");
                         break;
                     }
-                    if (menuRest.getMenuItems().isEmpty()) {
-                        System.out.println("This restaurant has no menu items yet.");
-                        break;
-                    }
 
-                    menuSystem.loadFromRestaurant(menuRest);
+                    // This loop keeps the "Matches list" alive so users can return to it easily
+                    boolean viewingShopList = true;
+                    while (viewingShopList) {
+                        Restaurant selectedRestaurant = null;
 
-                    System.out.println("1. Display sorted menu (A-Z)");
-                    System.out.println("2. Search food by name");
-                    System.out.print("Select option: ");
-                    int menuChoice = scanner.nextInt();
-                    scanner.nextLine();
-
-                    if (menuChoice == 1) {
-                        menuSystem.displaySortedMenu();
-                    } else if (menuChoice == 2) {
-                        System.out.print("Enter food name to search: ");
-                        String searchName = scanner.nextLine().trim();
-                        FoodItem found = menuSystem.searchByName(searchName);
-                        if (found != null) {
-                            System.out.println("\nItem found:");
-                            System.out.println("  " + found.toString());
+                        // 2. Resolve matching selections
+                        if (matches.size() == 1) {
+                            selectedRestaurant = matches.get(0);
+                            System.out.println("\nFound: " + selectedRestaurant.getRestaurantName());
+                            // Turn off list viewing since there's nowhere else to go back to
+                            viewingShopList = false; 
                         } else {
-                            System.out.println("\"" + searchName + "\" not found in this menu.");
+                            System.out.println("\n===== MATCHES FOUND FOR \"" + searchTerm.toUpperCase() + "\" =====");
+                            for (int i = 0; i < matches.size(); i++) {
+                                Restaurant r = matches.get(i);
+                                System.out.printf("[%d] %s (%s) - %s\n", (i + 1), r.getRestaurantName(), r.getFoodCategory(), r.getLocationNode());
+                            }
+                            System.out.printf("[%d] Exit Search & Return to Main Portal\n", (matches.size() + 1));
+                            
+                            System.out.print("Select a restaurant number: ");
+                            int restNum = scanner.nextInt();
+                            scanner.nextLine(); // Clear buffer
+                            
+                            if (restNum > 0 && restNum <= matches.size()) {
+                                selectedRestaurant = matches.get(restNum - 1);
+                            } else if (restNum == matches.size() + 1) {
+                                System.out.println("Exiting search...");
+                                break; // Breaks the viewingShopList loop, heading back to main portal
+                            } else {
+                                System.out.println(" Invalid selection. Please try again.");
+                                continue;
+                            }
                         }
-                    }
-                    break;
 
-                case 3:
-                    System.out.print("\nPlease enter the Restaurant ID you want to order from: ");
-                    String chosenID = scanner.nextLine().trim();
-
-                    Restaurant selectedRestaurant = managementSystem.getRestaurant(chosenID);
-                    if (selectedRestaurant != null) {
-                        // If user switches restaurants, clear the previous cart
+                        // 3. Prevent cross-ordering / Handle existing cart contents
+                        String chosenID = selectedRestaurant.getRestaurantID();
                         if (restaurantID != null && !chosenID.equals(restaurantID) && !cartStack.isEmpty()) {
-                            System.out.println("Warning! Your cart contains items from a different restaurant. ");
+                            System.out.println("\n Warning! Your cart contains items from a different restaurant.");
                             System.out.print("Do you want to clear the previous cart and start a new order? (Y/N): ");
                             String confirmClear = scanner.nextLine().trim();
+                            
                             if (confirmClear.equalsIgnoreCase("Y")) {
                                 while (!cartStack.isEmpty()) {
                                     cartStack.undoLastItem();
                                 }
                                 restaurantID = chosenID;
-                                System.out.println(
-                                        "Cart cleared. Switched to: " + selectedRestaurant.getRestaurantName());
+                                System.out.println("🗑️ Cart cleared. Switched to: " + selectedRestaurant.getRestaurantName());
                             } else {
-                                System.out.println("Returning to main menu without changing restaurant.");
-                                break;
+                                System.out.println("Returning to results list...");
+                                continue; // Skips the menu loading and loops back to the list selection
                             }
                         } else {
                             restaurantID = chosenID;
-                            System.out.println("You have selected: " + selectedRestaurant.getRestaurantName());
                         }
-                    } else {
-                        System.out.println("Invalid Restaurant ID.");
+
+                        // 4. Load the selected restaurant into Person 2's AVL Menu Subsystem
+                        if (selectedRestaurant.getMenuItems().isEmpty()) {
+                            System.out.println("This restaurant has no menu items listed yet.");
+                            if (matches.size() == 1) 
+                                break;
+                            continue;
+                        }
+                        menuSystem.loadFromRestaurant(selectedRestaurant);
+
+                        // 5. Present Customer Browsing & Ordering Workflow Loop
+                        boolean browsingMenu = true;
+                        while (browsingMenu) {
+                            System.out.println("\n---" + selectedRestaurant.getRestaurantName().toUpperCase() + "---");
+                            System.out.println("1. Display sorted menu (A-Z)");
+                            System.out.println("2. Search food item by name snippet");
+                            System.out.println("3. Add items directly to your Cart");
+                            System.out.println("4. Back to Shop List Results");
+                            System.out.println("5. Back to Main Menu");
+                            System.out.print("Select option (1-5): ");
+
+                            int menuChoice = scanner.nextInt();
+                            scanner.nextLine(); // Clean input stream buffer
+
+                            switch (menuChoice) {
+                                case 1:
+                                    System.out.println("\n📖 ===== " + selectedRestaurant.getRestaurantName().toUpperCase() + " MENU =====");
+                                    menuSystem.displaySortedMenu();
+                                    break;
+
+                                case 2:
+                                    System.out.print("Enter food item name keyword to search: ");
+                                    String searchName = scanner.nextLine().trim();
+                                    
+                                    List<FoodItem> foundItems = menuSystem.searchByKeyword(searchName);
+                                    if (!foundItems.isEmpty()) {
+                                        System.out.println("\n[MATCHING DISHES FOUND]:");
+                                        for (FoodItem item : foundItems) {
+                                            System.out.println("  • " + item.toString());
+                                        }
+                                    } else {
+                                        System.out.println(" \"" + searchName + "\" is not available here.");
+                                    }
+                                    break;
+
+                                case 3:
+                                    System.out.println("\n📥 Enter the EXACT Food Name to add to your cart (or type 'done' to finish):");
+                                    while (true) {
+                                        System.out.print("Item name: ");
+                                        String foodName = scanner.nextLine().trim();
+                                        if (foodName.equalsIgnoreCase("done")) {
+                                            System.out.println("Finished adding items to cart.");
+                                            break;
+                                        }
+
+                                        // Look up via exact name mapping rules (O(log n) efficiency check)
+                                        FoodItem itemToAdd = menuSystem.searchByName(foodName);
+
+                                        if (itemToAdd != null) {
+                                            cartStack.addItem(new OrderItem(itemToAdd));
+                                            System.out.printf("Current cart total: RM %.2f\n", cartStack.calculateTotal());
+                                        } else {
+                                            System.out.println("Item not found. Please verify spelling from the A-Z menu selection.");
+                                        }
+                                    }
+                                    break;
+
+                                case 4:                                    
+                                    System.out.println("Returning to your search results roster...");
+                                    browsingMenu = false; // Break out of this specific restaurant's hub loop
+                                    break;
+                                
+                                case 5:
+                                    System.out.println("Returning to main portal...");  
+                                    browsingMenu = false; // Break out of this specific restaurant's hub loop
+                                    viewingShopList = false; // Break out of background list loop too   
+                                    break;
+                                default:
+                                    System.out.println("Invalid choice selection.");
+                            }
+                        }
                     }
                     break;
 
-                case 4:
+                case 3:
                     System.out.println("\nDisplaying Cart.");
                     cartStack.displayCart();
                     break;
 
-                case 5:
+                case 4:
                     if (cartStack.isEmpty()) {
                         System.out.println("Your cart is already empty! Nothing to undo.");
                     } else {
@@ -362,47 +438,69 @@ public class MainApplication {
                     }
                     break;
 
-                case 6:
+                case 5:
                     if (cartStack.isEmpty() || restaurantID == null) {
                         System.out.println("Your cart is empty. Please add items before confirming your order.");
                         break;
                     }
-
+                    System.out.println("\n--- ORDER CONFIRMATION ---");
+                    System.out.println("You are about to place an order from: " + managementSystem.getRestaurant(restaurantID).getRestaurantName());
+                    System.out.printf("Delivery Location: %s\n", managementSystem.getUser(userID).getUserAddressNode());
+                    System.out.println("Order Summary:");
+                    cartStack.displayCart();
+                    System.out.printf("Your current order total is: RM %.2f\n", cartStack.calculateTotal());
                     System.out.println("Are you sure you want to confirm your order? (Y/N): ");
                     String confirm = scanner.nextLine().trim();
                     if (confirm.equalsIgnoreCase("Y")) {
                         System.out.println("\nSubmitting order to Processing Queue...");
 
-                        Order newOrder = new Order(userID, managementSystem.getUser(userID),
+                        Order newOrder = new Order(managementSystem.getUser(userID),
                                 managementSystem.getRestaurant(restaurantID), cartStack.confirmOrder());
 
                         orderQueue.receiveOrder(newOrder);
                         System.out.println("Order confirmed and added to processing queue!");
-
+                        System.out.println("Your order id is: " + newOrder.getOrderID());
+                        System.out.println("Your order is being prepared. You can track it once it's out for delivery.");
                         // Assign delivery rider and calculate delivery route
                         System.out.println("Matching optimal rider and path...");
 
-                        String restaurantLocNode = managementSystem.getRestaurant(restaurantID).getLocationNode();
+                        String restaurantLocNode =
+                                managementSystem.getRestaurant(restaurantID).getLocationNode();
 
-                        deliveryScheduler = new DeliveryScheduler(restaurantLocNode, nav);
+                        // DEBUG
+                        // System.out.println("\n===== RIDER DISTANCES =====");
 
-                        // Add all system riders to the delivery scheduler's priority queue
-                        for (Rider rider : systemRiders) {
-                            deliveryScheduler.registerRider(rider);
+                        // for (Rider r : deliveryScheduler.getRegisteredRiders()) {
+
+                        //     double distance =
+                        //         nav.calculateShortestPath(
+                        //             r.getCurrentLocation(),
+                        //             restaurantLocNode
+                        //         );
+
+                        //     System.out.println(
+                        //         r.getRiderName() + " distance = " + distance
+                        //     );
+                        // }
+
+                        DeliveryScheduler checkoutMatchEngine =new DeliveryScheduler(restaurantLocNode, nav);
+
+                        for (Rider r : deliveryScheduler.getRegisteredRiders()) {
+                            //for debug purposes
+                            //System.out.println("Evaluating rider: " + r.getRiderName());
+                            checkoutMatchEngine.registerRider(r);
                         }
 
-                        Rider assignedRider = deliveryScheduler.assignBestRider();
-
+                        Rider assignedRider = checkoutMatchEngine.assignBestRider();
                         if (assignedRider != null) {
-                            System.out.println(
-                                    "Successfully assigned " + assignedRider.getRiderName() + " to your order!");
+                            System.out.println( "Successfully assigned " + assignedRider.getRiderName() + " to your order!");
                         }
                     } else {
                         System.out.println("Checkout cancelled. Returning to main menu.");
                     }
                     break;
 
-                case 7:
+                case 6:
                     if (restaurantID == null) {
                         System.out.println("No active order found. Please place an order first.");
                         break;
@@ -415,19 +513,19 @@ public class MainApplication {
                     }
 
                     System.out.println("\n--- LIVE TRACKING ---");
-                    nav.calculateShortestPath(managementSystem.getRestaurant(restaurantID).getLocationNode(),
-                            userLocation);
+                    nav.calculateShortestPath(managementSystem.getRestaurant(restaurantID).getLocationNode(),userLocation);
                     nav.simulateDeliveryRoute(nav.finalRoute, myMap);
+                    System.out.println("Your order has been delivered! Thank you for using GOODTECH.");
 
                     restaurantID = null;
                     break;
 
-                case 8:
+                case 7:
                     System.out.println("Logging out of customer session...");
                     inCustomerMenu = false;
                     break;
 
-                case 9:
+                case 8:
                     System.out.println(
                             "Are you sure you want to delete your account? This action cannot be undone. (Y/N): ");
                     String deleteConfirm = scanner.nextLine().trim();
@@ -441,7 +539,7 @@ public class MainApplication {
                     break;
 
                 default:
-                    System.out.println("Invalid choice! Select 1-9.");
+                    System.out.println("Invalid choice! Select 1-8.");
             }
         }
     }

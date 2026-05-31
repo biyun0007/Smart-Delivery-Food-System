@@ -1,5 +1,7 @@
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -15,7 +17,10 @@ public class NavigationSystem {
 
     public double calculateShortestPath(String start, String end) {
         // This is where you implement the Dijkstra logic
-    
+        distances.clear();
+        previous.clear();
+        finalRoute = new NodeLinkedList<>();
+
         //Sort nodes by their distance values from smallest to largest.
         PriorityQueue<String> pq = new PriorityQueue<>(Comparator.comparingDouble(distances::get));   //(node) -> distances.get(node)
 
@@ -57,16 +62,24 @@ public class NavigationSystem {
             }
         }
 
-        String step = end; // Start tracing backward from the destination
-
         // Trace backward using the parent breadcrumbs until we hit the starting node
+        List<String> reversePath = new ArrayList<>();
+
+        String step = end;
+
         while (step != null) {
-            finalRoute.add(step); // Add this location node into our Linked List chain
-            step = previous.get(step); // Move backward to the node that led here
+            reversePath.add(step);
+            step = previous.get(step);
         }
 
-        System.out.println("\nCalculating best route from " + start + " to " + end + "...");
-        System.out.println("Shortest path found: " + start + " -> " + end + " (" + distances.get(end) + "km)");
+        finalRoute = new NodeLinkedList<>();
+
+        for (int i = reversePath.size() - 1; i >= 0; i--) {
+            finalRoute.add(reversePath.get(i));
+        }
+        // Debug purposes
+        //System.out.println("\nCalculating best route from " + start + " to " + end + "...");
+        //System.out.println("Shortest path found: " + start + " -> " + end + " (" + distances.get(end) + "km)");
         return distances.get(end);
     }
 
@@ -100,20 +113,29 @@ public class NavigationSystem {
                 }
             }
 
-            // 3. Countdown simulation for the current road segment
-            while (roadDistance > 0) {
-                // Note: Changed %d to %.2f since distance is a double (decimal number)
-                System.out.printf("Rider is at [%s] -> Heading to [%s] | Remaining: %.2f KM\n", 
-                                currentNodeName, nextNodeName, roadDistance);
-                
+            // 3. Simulate rider travelling along this road segment
+            double remainingDistance = roadDistance;
+
+            while (remainingDistance > 0) {
+
+                System.out.printf(
+                    "Rider travelling from [%s] to [%s] | Remaining: %.2f KM\n",
+                    currentNodeName,
+                    nextNodeName,
+                    remainingDistance
+                );
+
                 try {
-                    Thread.sleep(1500); // Wait 1.5 seconds to simulate travel time
+                    Thread.sleep(1500);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
-                
-                roadDistance--; // Decrease distance unit by 1 each loop step
+
+                remainingDistance -= 0.5;
             }
+
+            // Rider reaches the next location
+            System.out.println("Rider arrived at [" + nextNodeName + "]");
             current = current.next;
         }
 

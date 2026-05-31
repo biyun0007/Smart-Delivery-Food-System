@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class MenuTree {
 
     private class AVLNode {
@@ -33,13 +36,41 @@ public class MenuTree {
         return search(root, name);
     }
 
+    // Search food by keyword — O(n)
+    public List<FoodItem> searchByKeyword(String keyword) {
+        List<FoodItem> matches = new ArrayList<>();
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return matches;
+        }
+        // Run a recursive traversal to collect partial matching items
+        keywordSearchHelper(root, keyword.toLowerCase().trim(), matches);
+        return matches;
+    }
+
+    // Background helper for partial keyword search
+    private void keywordSearchHelper(AVLNode node, String keyword, List<FoodItem> matches) {
+        if (node == null) return;
+
+        // A. Scan the left branch
+        keywordSearchHelper(node.left, keyword, matches);
+
+        // B. Process current node using case-insensitive partial substring matching
+        String currentFoodName = node.item.getFoodName().toLowerCase();
+        if (currentFoodName.contains(keyword)) {
+            matches.add(node.item);
+        }
+
+        // C. Scan the right branch
+        keywordSearchHelper(node.right, keyword, matches);
+    }
+
     // Display all food items sorted A-Z — in-order traversal O(n)
     public void displaySortedMenu() {
         if (root == null) {
             System.out.println("  [Menu is empty]");
             return;
         }
-        System.out.println("\n  " + String.format("%-28s | %-12s | %s", "Food Name", "Category", "Price"));
+        System.out.println("\n  " + String.format("%-25s | %-12s | %s", "Food Name", "Category", "Price"));
         System.out.println("  " + "-".repeat(58));
         inOrder(root);
         System.out.println("  " + "-".repeat(58));

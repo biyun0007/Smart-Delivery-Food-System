@@ -2,9 +2,9 @@ public class OrderItem {
     private String foodName;
     private double price;
 
-    public OrderItem(String foodName, double price) {
-        this.foodName = foodName;
-        this.price = price;
+    public OrderItem(FoodItem foodItem) {
+        this.foodName = foodItem.getFoodName();
+        this.price = foodItem.getPrice();
     }
 
     public String getFoodName() {

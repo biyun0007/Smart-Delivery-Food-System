@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 public class ManagementSystem {
     private LinkedList<User> userList;
@@ -57,6 +59,26 @@ public class ManagementSystem {
     public Restaurant getRestaurant(String restaurantID) {
         return restaurantIndex.get(restaurantID);
     }
+
+    // Inside ManagementSystem.java
+    public List<Restaurant> searchRestaurantsByKeyword(String keyword) {
+        List<Restaurant> matchingRestaurants = new ArrayList<>();
+        String lowerKeyword = keyword.toLowerCase(); // For case-insensitive matching
+
+        for (Restaurant r : restaurantIndex.values()) { // or restaurantList
+            String name = r.getRestaurantName().toLowerCase();
+            String location = r.getLocationNode().toLowerCase();
+            String cuisine = r.getFoodCategory().toLowerCase();
+            String id = r.getRestaurantID().toLowerCase();
+
+            // Check if the keyword is contained in the name, location, or cuisine type!
+            if (name.contains(lowerKeyword) || location.contains(lowerKeyword) || cuisine.contains(lowerKeyword) || id.contains(lowerKeyword)) {
+                matchingRestaurants.add(r);
+            }
+        }
+        return matchingRestaurants;
+    }
+
 
     public int getTotalRestaurants() {
         return restaurantList.size();

@@ -1,0 +1,4 @@
+D001,Rider_Amir,KL Gate,4.8
+D002,Rider_Siti,PJ Gate,4.9
+D003,Rider_Raju,Main Library,4.5
+D004,Rider_Li,Mid Valley Megamall Food Court,4.7
