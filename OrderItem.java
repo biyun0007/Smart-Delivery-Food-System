@@ -1,6 +1,3 @@
-// =========================
-// OrderItem.java
-// =========================
 public class OrderItem {
     private String foodName;
     private double price;

@@ -1,5 +1,5 @@
-import java.util.PriorityQueue;
 import java.util.Comparator;
+import java.util.PriorityQueue;
 
 public class DeliveryScheduler {
 
@@ -29,7 +29,7 @@ public class DeliveryScheduler {
             return;
         }
 
-        System.out.println("===== Available Riders (Sorted by Priority) =====");
+        System.out.println("Available Riders (Sorted by Priority) :");
         
         // Create a temporary copy to drain elements in order
         PriorityQueue<Rider> tempQueue = new PriorityQueue<>(riderQueue.comparator());
@@ -47,7 +47,7 @@ public class DeliveryScheduler {
             System.out.println("No Riders Available.\n");
             return;
         }
-        System.out.println("===== Best Rider (Nearest Rider) =====");
+        System.out.println("Best Rider (Nearest Rider) :");
         System.out.println(riderQueue.peek());
         System.out.println();
     }

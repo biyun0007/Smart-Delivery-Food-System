@@ -1,6 +1,5 @@
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
@@ -27,8 +26,6 @@ public class NavigationSystem {
         //overwrite the distance of the start node to 0, since we are already at the start node, so the distance from start to start is 0
         distances.put(start, 0.0);
         pq.add(start);
-       
-
 
         while (!pq.isEmpty()) {
 
@@ -68,21 +65,18 @@ public class NavigationSystem {
             step = previous.get(step); // Move backward to the node that led here
         }
 
-        System.out.println("\n[SYSTEM] Calculating best route from " + start + " to " + end + "...");
-        System.out.println("[RESULT] Shortest path found: " + start + " -> " + end + " (" + distances.get(end) + "km)");
+        System.out.println("\nCalculating best route from " + start + " to " + end + "...");
+        System.out.println("Shortest path found: " + start + " -> " + end + " (" + distances.get(end) + "km)");
         return distances.get(end);
     }
 
-        
-
-
     public void simulateDeliveryRoute(NodeLinkedList<String> shortestPath, CityMap map) {
         if (shortestPath == null || shortestPath.isEmpty()) {
-            System.out.println("❌ Error: Invalid or empty route.");
+            System.out.println("Error! Invalid or empty route.");
             return;
         }
 
-        System.out.println("\n🚴 [RIDER STATUS]: Out for Delivery!");
+        System.out.println("\n[Rider is Out For Delivery!");
 
         // 1. Grab our custom head node to begin traversing the chain
         Node<String> current = shortestPath.getHead();
@@ -109,7 +103,7 @@ public class NavigationSystem {
             // 3. Countdown simulation for the current road segment
             while (roadDistance > 0) {
                 // Note: Changed %d to %.2f since distance is a double (decimal number)
-                System.out.printf("📍 Rider is at [%s] -> Heading to [%s] | Remaining: %.2f KM\n", 
+                System.out.printf("Rider is at [%s] -> Heading to [%s] | Remaining: %.2f KM\n", 
                                 currentNodeName, nextNodeName, roadDistance);
                 
                 try {
@@ -129,6 +123,6 @@ public class NavigationSystem {
         while (finalNode.next != null) {
             finalNode = finalNode.next;
         }
-        System.out.println("\n🎉 [DELIVERY SUCCESS]: Your food has arrived safely at " + finalNode.getDestination() + "!");
+        System.out.println("\nYour food has arrived safely at " + finalNode.getDestination() + "!");
     }
 }

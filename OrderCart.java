@@ -1,9 +1,6 @@
-// =========================
-// OrderCart.java
-// =========================
-import java.util.Stack;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 public class OrderCart {
 
@@ -19,9 +16,7 @@ public class OrderCart {
 
         cart.push(item);
 
-        System.out.println(
-                item.getFoodName() +" added to cart."
-        );
+        System.out.println(item.getFoodName() +" added to cart.");
     }
 
     // Pop item
@@ -31,10 +26,8 @@ public class OrderCart {
 
             OrderItem removed = cart.pop();
 
-            System.out.println(
-                    "Removed: " +
-                            removed.getFoodName()
-            );
+            System.out.println("Removed: " + removed.getFoodName());
+
         } else {
             System.out.println("Cart is empty.");
         }
@@ -50,7 +43,7 @@ public class OrderCart {
     }
 
     public void displayCart() {
-        System.out.println("\n===== CURRENT CART =====");
+        System.out.println("\n[Current Cart]");
         if (cart.isEmpty()) {
             System.out.println("Cart is empty.");
             return;

@@ -55,7 +55,7 @@ public class User {
 
     @Override
     public String toString() {
-        return "[User Profile]" +
+        return "\n[User Profile]" +
                "\nID      : " + userID + 
                "\nName    : " + userName + 
                "\nPhone   : " + userPhoneNumber +

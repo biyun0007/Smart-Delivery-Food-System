@@ -7,7 +7,7 @@ public class Restaurant {
     private String locationNode; 
     private String foodCategory;
     // For Person 3 to store the food items available at this restaurant
-    private List<String> menuItems; 
+    private List<FoodItem> menuItems; 
 
     public Restaurant(String restaurantID, String restaurantName, String locationNode, String foodCategory) {
         this.restaurantID = restaurantID;
@@ -50,17 +50,17 @@ public class Restaurant {
     }
 
     // Methods for Menu Management (Supports Search & Recommendation rubric)
-    public List<String> getMenuItems() { 
+    public List<FoodItem> getMenuItems() { 
         return menuItems; 
     }
     
-    public void addMenuItem(String itemName) { 
-        this.menuItems.add(itemName); 
+    public void addMenuItem(FoodItem item) { 
+        this.menuItems.add(item); 
     }
 
     @Override
     public String toString() {
-        return "[Restaurant Profile]" +
+        return "\n[Restaurant Profile]" +
                "\nID      : " + restaurantID +
                "\nName    : " + restaurantName +
                "\nCategory: " + foodCategory +
