@@ -1,5 +1,5 @@
 public class FoodItem {
-    private String restaurantID; 
+    private String restaurantID;
     private String foodName;
     private double price;
     private String category;
@@ -11,36 +11,36 @@ public class FoodItem {
         this.category = category;
     }
 
-    public String getRestaurantID() { 
-        return restaurantID; 
+    public String getRestaurantID() {
+        return restaurantID;
     }
 
-    public void setRestaurantID(String restaurantID) { 
-        this.restaurantID = restaurantID; 
+    public void setRestaurantID(String restaurantID) {
+        this.restaurantID = restaurantID;
     }
 
-    public String getFoodName() { 
-        return foodName; 
+    public String getFoodName() {
+        return foodName;
     }
 
-    public void setFoodName(String foodName) { 
-        this.foodName = foodName; 
+    public void setFoodName(String foodName) {
+        this.foodName = foodName;
     }
 
-    public double getPrice() { 
-        return price; 
+    public double getPrice() {
+        return price;
     }
 
-    public void setPrice(double price) { 
-        this.price = price; 
+    public void setPrice(double price) {
+        this.price = price;
     }
 
-    public String getCategory() { 
-        return category; 
+    public String getCategory() {
+        return category;
     }
 
-    public void setCategory(String category) { 
-        this.category = category; 
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     @Override

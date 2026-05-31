@@ -16,6 +16,7 @@ public class ManagementSystem {
     private final String userFile = "users.txt";
     private final String adminFile = "admin.txt";
     private final String restaurantFile = "restaurants.txt";
+    private final String menuFile = "menus.txt";
 
     // Use HashMap for fast data retrieval
     private HashMap<String, User> userIndex;
@@ -32,6 +33,7 @@ public class ManagementSystem {
         loadUsersFromFile();
         loadAdminsFromFile();
         loadRestaurantsFromFile();
+        loadMenusFromFile();
     }
 
     // Restaurant Management
@@ -72,13 +74,13 @@ public class ManagementSystem {
             String id = r.getRestaurantID().toLowerCase();
 
             // Check if the keyword is contained in the name, location, or cuisine type!
-            if (name.contains(lowerKeyword) || location.contains(lowerKeyword) || cuisine.contains(lowerKeyword) || id.contains(lowerKeyword)) {
+            if (name.contains(lowerKeyword) || location.contains(lowerKeyword) || cuisine.contains(lowerKeyword)
+                    || id.contains(lowerKeyword)) {
                 matchingRestaurants.add(r);
             }
         }
         return matchingRestaurants;
     }
-
 
     public int getTotalRestaurants() {
         return restaurantList.size();
@@ -129,6 +131,46 @@ public class ManagementSystem {
             }
         } catch (IOException e) {
             System.out.println("Error saving restaurants to text file: " + e.getMessage());
+        }
+    }
+
+    // Load menu items from file into each restaurant on startup
+    private void loadMenusFromFile() {
+        File file = new File(menuFile);
+        if (!file.exists())
+            return;
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(menuFile))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.trim().isEmpty())
+                    continue;
+                String[] parts = line.split(",", 4);
+                if (parts.length == 4) {
+                    String restaurantID = parts[0].trim();
+                    String foodName = parts[1].trim();
+                    double price = Double.parseDouble(parts[2].trim());
+                    String category = parts[3].trim();
+
+                    Restaurant restaurant = getRestaurant(restaurantID);
+                    if (restaurant != null) {
+                        restaurant.addMenuItem(new FoodItem(restaurantID, foodName, price, category));
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error loading menu items from file: " + e.getMessage());
+        }
+    }
+
+    // Append one new menu item to file — called when admin adds item
+    public void appendMenuItemToFile(FoodItem item) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(menuFile, true))) {
+            writer.write(item.getRestaurantID() + "," + item.getFoodName() + ","
+                    + item.getPrice() + "," + item.getCategory());
+            writer.newLine();
+        } catch (IOException e) {
+            System.out.println("Error saving menu item to file: " + e.getMessage());
         }
     }
 
