@@ -122,7 +122,7 @@ public class ManagementSystem {
         }
     }
 
-    private void saveRestaurantsToFile() {
+    public void saveRestaurantsToFile() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(restaurantFile))) {
             for (Restaurant restaurant : restaurantList) {
                 writer.write(restaurant.getRestaurantID() + "," + restaurant.getRestaurantName() + ","
@@ -171,6 +171,20 @@ public class ManagementSystem {
             writer.newLine();
         } catch (IOException e) {
             System.out.println("Error saving menu item to file: " + e.getMessage());
+        }
+    }
+
+    public void saveAllMenuItemsToFile() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(menuFile))) {
+            for (Restaurant restaurant : restaurantList) {
+                for (FoodItem item : restaurant.getMenuItems()) {
+                    writer.write(item.getRestaurantID() + "," + item.getFoodName() + ","
+                            + item.getPrice() + "," + item.getCategory());
+                    writer.newLine();
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error saving menu items to file: " + e.getMessage());
         }
     }
 

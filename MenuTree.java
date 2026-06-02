@@ -86,6 +86,14 @@ public class MenuTree {
         }
     }
 
+     public int getSize() {
+         return size;
+     }
+
+     public boolean isEmpty() {
+         return size == 0;
+      }
+
     // Recursive insert — returns updated subtree root after rebalancing
     private AVLNode insert(AVLNode node, FoodItem item) {
         if (node == null)

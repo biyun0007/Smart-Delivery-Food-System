@@ -9,3 +9,4 @@ R008,Dessert Haven,Mid Valley Megamall Food Court,Desserts
 R009,KFC,KFC University,Fast Food
 R010,Vegan Delights,Mid Valley Megamall Food Court,Vegan
 R011,Zus Coffee,Zus Coffee University Malaya,Cafe
+R012,HeyTea,Mid Valley Megamall,Milk Tea
