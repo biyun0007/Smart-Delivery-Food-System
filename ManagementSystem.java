@@ -223,8 +223,13 @@ public class ManagementSystem {
         }
     }
 
-    public User getUser(String userID) {
-        return userIndex.get(userID);
+    public User getUser(String id) {
+        for (User u : userList) {
+            if (u.getUserID().equals(id)) {
+                return u; 
+            }
+        }
+        return null;
     }
 
     public void displayAllUsers() {
@@ -235,7 +240,7 @@ public class ManagementSystem {
     }
 
     // Save all users currently into text file
-    private void saveUsersToFile() {
+    public void saveUsersToFile() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(userFile))) {
             for (User user : userList) {
                 writer.write(user.getUserID() + "," + user.getUserName() + "," + user.getUserPhoneNumber() + ","

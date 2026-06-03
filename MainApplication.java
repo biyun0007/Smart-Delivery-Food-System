@@ -98,8 +98,15 @@ public class MainApplication {
             System.out.print("Please enter your phone number: ");
             String userPhoneNumber = scanner.next();
             scanner.nextLine(); // Consume the newline
-            System.out.print("Please enter your location (e.g., UM Central, KL Gate): ");
-            String userLocation = scanner.nextLine();
+            System.out.print("Please enter your location by selecting a number from the following list: ");
+            int i = 1;
+            for (String loc : myMap.getLocations()) {
+                System.out.println(i + ". " + loc);
+                i++;
+            }
+            int locationChoice = scanner.nextInt();
+            scanner.nextLine(); // Consume the newline
+            String userLocation = myMap.getLocations().get(locationChoice - 1);
 
             String userPassword, confirmPassword;
 
@@ -116,6 +123,7 @@ public class MainApplication {
                 }
             } while (true);
             managementSystem.addUser(new User(userID, userName, userPhoneNumber, userLocation, userPassword));
+            managementSystem.saveUsersToFile();
 
         } else {
             scanner.nextLine(); // Consume the newline
@@ -139,10 +147,22 @@ public class MainApplication {
         String changeLocation = scanner.next().trim();
         scanner.nextLine();
         if (changeLocation.equalsIgnoreCase("Y")) {
-            System.out.print("Please enter your new delivery location: ");
-            userLocation = scanner.nextLine();
-            managementSystem.getUser(userID).setUserAddressNode(userLocation);
-            System.out.println("Delivery location updated to: " + userLocation);
+            int i = 1;
+            for(String loc : myMap.getLocations()) {
+                System.out.println(i + ". " + loc);
+                i++;
+            }
+            System.out.print("Select a new delivery location by number: ");
+            int locChoice = scanner.nextInt();
+            scanner.nextLine(); // Consume the newline
+            if (locChoice > 0 && locChoice <= myMap.getLocations().size()) {
+                userLocation = myMap.getLocations().get(locChoice - 1);
+                System.out.println("Delivery location updated to: " + userLocation);
+                managementSystem.getUser(userID).setUserAddressNode(userLocation);
+                managementSystem.saveUsersToFile();
+            } else {
+                System.out.println("Invalid selection. Keeping current location.");
+            }
         }
 
         // menu for customer portal
@@ -271,8 +291,7 @@ public class MainApplication {
 
                             switch (menuChoice) {
                                 case 1:
-                                    System.out.println("\n📖 ===== "
-                                            + selectedRestaurant.getRestaurantName().toUpperCase() + " MENU =====");
+                                    System.out.println("\n ===== "+ selectedRestaurant.getRestaurantName().toUpperCase() + " MENU =====");
                                     menuSystem.displaySortedMenu();
                                     break;
 
@@ -456,11 +475,27 @@ public class MainApplication {
                     break;
                 case 9:
                     // Change delivery location
+                    int i = 1;
+                    for(String loc : myMap.getLocations()) {
+                        System.out.println(i + ". " + loc);
+                        i++;
+                    }
+                    System.out.print("Select a new delivery location by number: ");
+                    int locChoice = scanner.nextInt();
+                    scanner.nextLine(); // Consume the newline
+                    if (locChoice > 0 && locChoice <= myMap.getLocations().size()) {
+                        userLocation = myMap.getLocations().get(locChoice - 1);
+                        System.out.println("Delivery location updated to: " + userLocation);
+                        managementSystem.getUser(userID).setUserAddressNode(userLocation);
+                    } else {
+                        System.out.println("Invalid selection. Keeping current location.");
+                    }
                     System.out.print("Please enter your new delivery location: ");
-                    String newLocation = scanner.nextLine();
-                    System.out.println("Delivery location updated to: " + newLocation);
-                    managementSystem.getUser(userID).setUserAddressNode(newLocation);
+                    userLocation = scanner.nextLine();
+                    managementSystem.getUser(userID).setUserAddressNode(userLocation);
+                    System.out.println("Delivery location updated to: " + userLocation);
                     break;
+
                 default:
                     System.out.println("Invalid choice! Select 1-8.");
             }

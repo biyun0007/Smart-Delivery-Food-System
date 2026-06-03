@@ -28,8 +28,9 @@ public class CityMap {
     public Map<String, List<Edge>> getAdjacencyList() {
         return adjacencyList;
     }
-    public Set<String> getLocations() {
-        return adjacencyList.keySet(); //return locations in the map as a set of strings
+    
+    public List<String> getLocations() {
+        return new ArrayList<>(adjacencyList.keySet()); 
     }
 
     public List<Edge> getRoadsFrom(String location) {
