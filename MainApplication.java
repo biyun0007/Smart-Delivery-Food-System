@@ -93,58 +93,91 @@ public class MainApplication {
         System.out.print("Please enter your user ID to log in / Sign up by default if not found):");
         String userID = scanner.next();
         scanner.nextLine(); // Consume the newline character after next()
-        do{
+
+        boolean isAuthenticated = false; 
+
+        do {
+            // Primary User Verification Check
             if (managementSystem.getUser(userID) == null) {
                 System.out.println("User not found. Creating new user profile...");
                 System.out.print("Please enter your name: ");
                 String userName = scanner.nextLine();
-                System.out.print("Please enter your phone number: ");
-                String userPhoneNumber = scanner.next();
-                scanner.nextLine(); // Consume the newline
-                System.out.println("Please enter your location by selecting a number from the following list: ");
-                int i = 1;
-                for (String loc : myMap.getLocations()) {
-                    System.out.println(i + ". " + loc);
-                    i++;
-                }
-                System.out.print("Select a location by number: ");
-                int locationChoice = scanner.nextInt();
-                scanner.nextLine(); // Consume the newline
-                String userLocation = myMap.getLocations().get(locationChoice - 1);
-
+                
+                String userPhoneNumber;
+                String userLocation;
                 String userPassword, confirmPassword;
+                
+                // Dedicated Phone Number & Info Registration Validation Loop
+                while (true) {
+                    System.out.print("Please enter your phone number: ");
+                    userPhoneNumber = scanner.next();
+                    scanner.nextLine(); // Consume the trailing newline
 
-                do {
-                    System.out.print("Create your password: ");
-                    userPassword = scanner.nextLine();
-                    System.out.print("Confirm your password: ");
-                    confirmPassword = scanner.nextLine();
-                    if (!userPassword.equals(confirmPassword)) {
-                        System.out.println("Passwords do not match. Please try again.");
-                    } else {
-                        System.out.println("User '" + userName + "' created successfully. Welcome " + userName + "!");
-                        break;
+                    // --- REVISED: COMBINED CHECK WITH NO EXTRA LOOPS OR EXTRA IF-ELSE BLOCKS ---
+                    if (!userPhoneNumber.matches("\\d{10,11}") || managementSystem.hasDuplicatePhoneNumber(userPhoneNumber)) {
+                        if (!userPhoneNumber.matches("\\d{10,11}")) {
+                            System.out.println("Invalid phone number format! It must contain only numbers and be 10 or 11 digits long.\n");
+                        }
+                        System.out.println("Please try again directly below.");
+                        continue; // Immediately jumps back up to "Please enter your phone number: "
                     }
-                } while (true);
-                managementSystem.addUser(new User(userID, userName, userPhoneNumber, userLocation, userPassword));
-                break;
+                    
+                    System.out.println("Please enter your location by selecting a number from the following list: ");
+                    int i = 1;
+                    for (String loc : myMap.getLocations()) {
+                        System.out.println(i + ". " + loc);
+                        i++;
+                    }
+                    System.out.print("Select a location by number: ");
+                    int locationChoice = scanner.nextInt();
+                    scanner.nextLine(); // Consume the trailing newline
+                    userLocation = myMap.getLocations().get(locationChoice - 1);
+
+                    // Password Construction and Match Verification Loop
+                    while (true) {
+                        System.out.print("Create your password: ");
+                        userPassword = scanner.nextLine();
+                        System.out.print("Confirm your password: ");
+                        confirmPassword = scanner.nextLine();
+                        if (!userPassword.equals(confirmPassword)) {
+                            System.out.println("Passwords do not match. Please try again.");
+                        } else {
+                            break; // Exit password verification block
+                        }
+                    }
+
+                    // Construct profile instance and run structural constraints mapping
+                    User newUser = new User(userID, userName, userPhoneNumber, userLocation, userPassword);
+                    boolean registrationSuccess = managementSystem.addUser(newUser);
+
+                    if (registrationSuccess) {
+                        System.out.println("User '" + userName + "' created successfully. Welcome " + userName + "!");
+                        isAuthenticated = true; // Set to true because they are now safely in the database
+                        break; // Break the registration loop because info is valid
+                    }
+                }
+                
+                if (isAuthenticated) {
+                    break; // Safely exit outer authentication loop to proceed to customer portal
+                }
+
             } else {
+                // Handle standard existing user verification path
                 System.out.print("Enter your password:");
                 String userPassword = scanner.nextLine();
                 if (userPassword.equals(managementSystem.getUser(userID).getUserPassword())) {
                     System.out.println("Welcome back " + managementSystem.getUser(userID).getUserName() + "!");
-                    break;
+                    break; // Authenticated successfully. Exit main portal loop.
                 } else {
                     System.out.println("Incorrect password. Please try again.");
-                    // scanner.nextLine(); // Consume the newline
                     System.out.print("Please enter your user ID to log in / Sign up by default if not found):");
                     userID = scanner.next();
                     scanner.nextLine(); // Consume the newline character after next()
                 }
             }
-         } while (true);
-        
+        } while (true);
 
+// Now runCustomerPortal will never receive a null user profile!
         // check if user wants to change delivery location
         String userLocation = managementSystem.getUser(userID).getUserAddressNode();
         System.out.println("Delivery location set to: " + userLocation);

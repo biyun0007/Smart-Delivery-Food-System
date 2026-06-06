@@ -193,26 +193,24 @@ public class ManagementSystem {
     }
 
     // User Management
-    public void addUser(User user) {
-        if (userIndex.containsKey(user.getUserID())) {
-            System.out.println("User ID '" + user.getUserID() + "' already exists!");
-            return;
-        }
-
-        for (User existingUser : userList) {
-            if (existingUser.getUserPhoneNumber().equals(user.getUserPhoneNumber())) {
-                System.out.println("Phone number '" + user.getUserPhoneNumber() + "' is already registered for user '"
-                        + existingUser.getUserName() + "'.");
-                return;
-            }
-        }
-
-        // Add user if no duplication
+    public boolean addUser(User user) {
         userList.add(user);
         userIndex.put(user.getUserID(), user);
         System.out.println("Welcome, User '" + user.getUserName() + "'!");
-        
         saveUsersToFile();
+        return true;
+    }
+
+    // Check for duplicate phone numbers
+    public boolean hasDuplicatePhoneNumber(String phoneNumber) {
+        for (User existingUser : userList) {
+            if (existingUser.getUserPhoneNumber().equals(phoneNumber)) {
+                System.out.println("\n[Registration Error] Phone number '" + phoneNumber 
+                        + "' is already registered under the name '" + existingUser.getUserName() + "'.");
+                return true; // Duplicate found
+            }
+        }
+        return false; 
     }
 
     public void removeUser(String userID) {
