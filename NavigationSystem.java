@@ -19,15 +19,15 @@ public class NavigationSystem {
         Map<String, String> previous = new HashMap<>();
         finalRoute = new NodeLinkedList<>();
 
-        //Sort nodes by their distance values from smallest to largest.
-        PriorityQueue<String> pq = new PriorityQueue<>(Comparator.comparingDouble(distances::get));   //(node) -> distances.get(node)
-
         // Initialize distances all to infinity except the start node
         for (String node : map.getLocations()) {
             distances.put(node, Double.MAX_VALUE);
         }
         //overwrite the distance of the start node to 0, since we are already at the start node, so the distance from start to start is 0
         distances.put(start, 0.0);
+
+        //Sort nodes by their distance values from smallest to largest.
+        PriorityQueue<String> pq = new PriorityQueue<>(Comparator.comparingDouble(distances::get));   //(node) -> distances.get(node)
         pq.add(start);
 
         while (!pq.isEmpty()) {
@@ -138,7 +138,7 @@ public class NavigationSystem {
         // 5. Final success message using data pointers
         // Find the very last location name by scanning to the end node
         Node<String> finalNode = shortestPath.getHead();
-        while (finalNode.next != null) {
+        while (finalNode != null && finalNode.next != null) {
             finalNode = finalNode.next;
         }
         System.out.println("\nYour food has arrived safely at " + finalNode.getDestination() + "!");

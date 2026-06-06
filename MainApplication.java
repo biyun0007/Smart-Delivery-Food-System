@@ -450,7 +450,13 @@ public class MainApplication {
                         break;
                     }
 
-                    System.out.println("\n--- LIVE TRACKING ---");
+                    System.out.println("\n=========================================");
+                    System.out.println("       ACTIVE ORDER LIVE TRACKING        ");
+                    System.out.println("=========================================");
+                    System.out.println("Customer Profile : " + managementSystem.getUser(userID).getUserName());
+                    System.out.println("Dispatch From    : " + currentRest.getRestaurantName() + " (" + currentRest.getLocationNode() + ")");
+                    System.out.println("Destination Node : " + userLocation);
+                    System.out.println("Assigned Courier : " + (assignedRider != null ? assignedRider.getRiderName() : "Searching..."));
                     nav.calculateShortestPath(managementSystem.getRestaurant(restaurantID).getLocationNode(),
                             userLocation);
                     nav.simulateDeliveryRoute(nav.finalRoute, myMap);
@@ -464,7 +470,7 @@ public class MainApplication {
 
                     restaurantID = null;
                     break;
-
+                
                 case 7:
                     System.out.println("Logging out of customer session...");
                     inCustomerMenu = false;
@@ -542,10 +548,11 @@ public class MainApplication {
             System.out.println("3. View All Restaurants");
             System.out.println("4. Update Restaurant Information");
             System.out.println("5. Update Restaurant Menu");
-            System.out.println("6. Manage User Accounts");
-            System.out.println("7. Display All Admin Accounts");
-            System.out.println("8. Logout & Back");
-            System.out.print("Please select an option (1-8): ");
+            System.out.println("6. Review Active Orders");
+            System.out.println("7. Manage User Accounts");
+            System.out.println("8. Display All Admin Accounts");
+            System.out.println("9. Logout & Back");
+            System.out.print("Please select an option (1-9): ");
 
             if (!scanner.hasNextInt()) {
                 System.out.println("Invalid input! Please enter a number.");
@@ -708,7 +715,24 @@ public class MainApplication {
                             }
                             break;
                     }break;
-                case 6:
+
+                case 6: // New case to review the shared FIFO queue
+                    System.out.println("\n===== REVENUE & ORDER REVIEW DASHBOARD =====");
+                    
+                    // 1. Display the current live state of the queue
+                    orderQueue.displayActiveOrders(); 
+                    
+                    // 2. Ask the admin if they want to process the next order in line
+                    System.out.print("\nWould you like to process and cook the next order in the queue? (Y/N): ");
+                    String processConfirm = scanner.nextLine().trim();
+                    
+                    if (processConfirm.equalsIgnoreCase("Y")) {
+                        System.out.println();
+                        // Polling the oldest order out of the FIFO structure
+                        orderQueue.processNextOrder(); 
+                    }
+                    break;
+                case 7:
                     // Implement user account management logic here
                     System.out.print("Remove user account by ID: ");
                     String userIdToRemove = scanner.nextLine().trim();
@@ -719,12 +743,12 @@ public class MainApplication {
                     }
                     break;
 
-                case 7:
+                case 8:
                     System.out.println("Displaying active admin accounts...");
                     managementSystem.displayAllAdmins();
                     break;
 
-                case 8:
+                case 9:
                     System.out.println("Logging out of admin session...");
                     inAdminMenu = false;
                     break;

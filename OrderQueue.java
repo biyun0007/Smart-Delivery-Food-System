@@ -43,4 +43,12 @@ public class OrderQueue {
             System.out.println(order);
         }
     }
+    public Order getOrderByID(String orderID) {
+        for (Order order : activeOrders) {
+            if (order.getOrderID().equals(orderID)) {
+                return order;
+            }
+        }
+        return null; // Not found
+    }
 }
