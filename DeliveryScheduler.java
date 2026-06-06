@@ -144,4 +144,16 @@ public class DeliveryScheduler {
             this.riderQueue.offer(r);
         }
     }
+
+    public void setRiderLocation(Rider rider, String newLocation) {
+        rider.updateLocation(newLocation);
+        saveRidersToFile(); // Persist the location update immediately
+    }
+    public void rateRider(Rider rider, double newRating) {
+        newRating = Math.max(1.0, Math.min(5.0, newRating)); // Ensure rating is between 1 and 5
+        double averageRating= (rider.getRating() + newRating) / 2; // Simple average for demo purposes
+        rider.updateRating(averageRating);
+        saveRidersToFile(); // Persist the rating update immediately
+    }
+
 }

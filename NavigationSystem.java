@@ -7,8 +7,6 @@ import java.util.PriorityQueue;
 
 public class NavigationSystem {
     private CityMap map;
-    private Map<String, Double> distances = new HashMap<>();
-    private Map<String, String> previous = new HashMap<>(); // To reconstruct the path later,store the previous node for each visited node
     NodeLinkedList<String> finalRoute = new NodeLinkedList<>();
 
     public NavigationSystem(CityMap map) {
@@ -17,8 +15,8 @@ public class NavigationSystem {
 
     public double calculateShortestPath(String start, String end) {
         // This is where you implement the Dijkstra logic
-        distances.clear();
-        previous.clear();
+        Map<String, Double> distances = new HashMap<>();
+        Map<String, String> previous = new HashMap<>();
         finalRoute = new NodeLinkedList<>();
 
         //Sort nodes by their distance values from smallest to largest.
@@ -64,7 +62,6 @@ public class NavigationSystem {
 
         // Trace backward using the parent breadcrumbs until we hit the starting node
         List<String> reversePath = new ArrayList<>();
-
         String step = end;
 
         while (step != null) {
@@ -73,7 +70,6 @@ public class NavigationSystem {
         }
 
         finalRoute = new NodeLinkedList<>();
-
         for (int i = reversePath.size() - 1; i >= 0; i--) {
             finalRoute.add(reversePath.get(i));
         }

@@ -54,3 +54,5 @@ R011,Americano,7.9,Cafe
 R011,Matcha Latte,9.9,Cafe
 R011,Croissant,6.9,Cafe
 R011,Caramel Latte,9.9,Cafe
+R012,Jasmine Tea,11.9,Milk Tea
+R012,Matcha Bobo,13.5,Milk Tea

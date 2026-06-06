@@ -11,6 +11,7 @@ public class MainApplication {
     private static NavigationSystem nav;
     private static DeliveryScheduler deliveryScheduler = new DeliveryScheduler();
     private static MenuTree menuSystem = new MenuTree();
+    private static Rider assignedRider = null;
 
     public static void main(String[] args) {
         myMap.addLocation("UM Central");
@@ -88,46 +89,46 @@ public class MainApplication {
     // Customer Portal
     public static void runCustomerPortal(Scanner scanner) {
         // login/sign up process as USER
+        
         System.out.print("Please enter your user ID to log in / Sign up by default if not found):");
         String userID = scanner.next();
-        if (managementSystem.getUser(userID) == null) {
-            System.out.println("User not found. Creating new user profile...");
-            System.out.print("Please enter your name: ");
-            String userName = scanner.nextLine();
-            scanner.nextLine(); // Consume the newline054
-            System.out.print("Please enter your phone number: ");
-            String userPhoneNumber = scanner.next();
-            scanner.nextLine(); // Consume the newline
-            System.out.print("Please enter your location by selecting a number from the following list: ");
-            int i = 1;
-            for (String loc : myMap.getLocations()) {
-                System.out.println(i + ". " + loc);
-                i++;
-            }
-            int locationChoice = scanner.nextInt();
-            scanner.nextLine(); // Consume the newline
-            String userLocation = myMap.getLocations().get(locationChoice - 1);
-
-            String userPassword, confirmPassword;
-
-            do {
-                System.out.print("Create your password: ");
-                userPassword = scanner.nextLine();
-                System.out.print("Confirm your password: ");
-                confirmPassword = scanner.nextLine();
-                if (!userPassword.equals(confirmPassword)) {
-                    System.out.println("Passwords do not match. Please try again.");
-                } else {
-                    System.out.println("User '" + userName + "' created successfully. Welcome " + userName + "!");
-                    break;
+        scanner.nextLine(); // Consume the newline character after next()
+        do{
+            if (managementSystem.getUser(userID) == null) {
+                System.out.println("User not found. Creating new user profile...");
+                System.out.print("Please enter your name: ");
+                String userName = scanner.nextLine();
+                System.out.print("Please enter your phone number: ");
+                String userPhoneNumber = scanner.next();
+                scanner.nextLine(); // Consume the newline
+                System.out.println("Please enter your location by selecting a number from the following list: ");
+                int i = 1;
+                for (String loc : myMap.getLocations()) {
+                    System.out.println(i + ". " + loc);
+                    i++;
                 }
-            } while (true);
-            managementSystem.addUser(new User(userID, userName, userPhoneNumber, userLocation, userPassword));
-            managementSystem.saveUsersToFile();
+                System.out.print("Select a location by number: ");
+                int locationChoice = scanner.nextInt();
+                scanner.nextLine(); // Consume the newline
+                String userLocation = myMap.getLocations().get(locationChoice - 1);
 
-        } else {
-            scanner.nextLine(); // Consume the newline
-            do {
+                String userPassword, confirmPassword;
+
+                do {
+                    System.out.print("Create your password: ");
+                    userPassword = scanner.nextLine();
+                    System.out.print("Confirm your password: ");
+                    confirmPassword = scanner.nextLine();
+                    if (!userPassword.equals(confirmPassword)) {
+                        System.out.println("Passwords do not match. Please try again.");
+                    } else {
+                        System.out.println("User '" + userName + "' created successfully. Welcome " + userName + "!");
+                        break;
+                    }
+                } while (true);
+                managementSystem.addUser(new User(userID, userName, userPhoneNumber, userLocation, userPassword));
+                break;
+            } else {
                 System.out.print("Enter your password:");
                 String userPassword = scanner.nextLine();
                 if (userPassword.equals(managementSystem.getUser(userID).getUserPassword())) {
@@ -136,9 +137,13 @@ public class MainApplication {
                 } else {
                     System.out.println("Incorrect password. Please try again.");
                     // scanner.nextLine(); // Consume the newline
+                    System.out.print("Please enter your user ID to log in / Sign up by default if not found):");
+                    userID = scanner.next();
+                    scanner.nextLine(); // Consume the newline character after next()
                 }
-            } while (true);
-        }
+            }
+         } while (true);
+        
 
         // check if user wants to change delivery location
         String userLocation = managementSystem.getUser(userID).getUserAddressNode();
@@ -190,7 +195,6 @@ public class MainApplication {
 
             int choice = scanner.nextInt();
             scanner.nextLine();
-
             switch (choice) {
                 case 1:
                     System.out.println("\nDisplaying all restaurants...");
@@ -303,7 +307,7 @@ public class MainApplication {
                                     if (!foundItems.isEmpty()) {
                                         System.out.println("\n[MATCHING DISHES FOUND]:");
                                         for (FoodItem item : foundItems) {
-                                            System.out.println("  • " + item.toString());
+                                            System.out.println(item.toString());
                                         }
                                     } else {
                                         System.out.println(" \"" + searchName + "\" is not available here.");
@@ -394,8 +398,7 @@ public class MainApplication {
                         orderQueue.receiveOrder(newOrder);
                         System.out.println("Order confirmed and added to processing queue!");
                         System.out.println("Your order id is: " + newOrder.getOrderID());
-                        System.out
-                                .println("Your order is being prepared. You can track it once it's out for delivery.");
+                        System.out.println("Your order is being prepared. You can track it once it's out for delivery.");
                         // Assign delivery rider and calculate delivery route
                         System.out.println("Matching optimal rider and path...");
 
@@ -425,7 +428,7 @@ public class MainApplication {
                             checkoutMatchEngine.registerRider(r);
                         }
 
-                        Rider assignedRider = checkoutMatchEngine.assignBestRider();
+                        assignedRider = checkoutMatchEngine.assignBestRider();
                         if (assignedRider != null) {
                             System.out.println(
                                     "Successfully assigned " + assignedRider.getRiderName() + " to your order!");
@@ -452,6 +455,12 @@ public class MainApplication {
                             userLocation);
                     nav.simulateDeliveryRoute(nav.finalRoute, myMap);
                     System.out.println("Your order has been delivered! Thank you for using GOODTECH.");
+                    System.out.print("Rate your delivery experience with " + assignedRider.getRiderName() + " (1-5 stars): ");
+                    int rating = scanner.nextInt();
+                    scanner.nextLine(); // Consume newline  
+                    deliveryScheduler.rateRider(assignedRider, rating);
+                    deliveryScheduler.setRiderLocation(assignedRider, userLocation);
+                    
 
                     restaurantID = null;
                     break;
@@ -475,6 +484,7 @@ public class MainApplication {
                     break;
                 case 9:
                     // Change delivery location
+                    System.out.println("\nCurrent delivery location: " + userLocation);
                     int index = 1;
                     for (String loc : myMap.getLocations()) {
                         System.out.println(index + ". " + loc);
@@ -557,8 +567,18 @@ public class MainApplication {
 
                     System.out.print("Enter restaurant name: ");
                     String restaurantName = scanner.nextLine().trim();
-                    System.out.print("Enter restaurant location: ");
-                    String location = scanner.nextLine().trim();
+                    
+                    System.out.println("Choose location for the restaurant: ");
+                    int i = 1;
+                    for (String loc : myMap.getLocations()) {
+                        System.out.println(i + ". " + loc);
+                        i++;
+                    }
+                    System.out.print("Select a location by number: ");
+                    int locationChoice = scanner.nextInt();
+                    scanner.nextLine(); // Consume the newline
+                    String location = myMap.getLocations().get(locationChoice - 1);
+
                     System.out.print("Enter food category: ");
                     String foodCategory = scanner.nextLine().trim();
 
@@ -591,23 +611,41 @@ public class MainApplication {
 
                     System.out.print("Enter restaurant ID to update: ");
                     String restaurantIdToUpdate = scanner.nextLine().trim();
-                    Restaurant restaurantToUpdate = managementSystem.getRestaurant(restaurantIdToUpdate);
-                    if (restaurantToUpdate != null) {
-                        System.out.print("Enter new name (Current: " + restaurantToUpdate.getRestaurantName() + "): ");
-                        String newRestaurantName = scanner.nextLine().trim();
-                        System.out.print("Enter new map node (Current: " + restaurantToUpdate.getLocationNode() + "): ");
-                        String newLocation = scanner.nextLine().trim();
-                        System.out.print("Enter new category (Current: " + restaurantToUpdate.getFoodCategory() + "): ");
-                        String newFoodCategory = scanner.nextLine().trim();
 
-                        restaurantToUpdate.setRestaurantName(newRestaurantName);
-                        restaurantToUpdate.setLocationNode(newLocation);
-                        restaurantToUpdate.setFoodCategory(newFoodCategory);
-                        managementSystem.saveRestaurantsToFile();
-                        System.out.println("Restaurant " + restaurantIdToUpdate + " details updated successfully.");
-                    } else {
-                        System.out.println("Restaurant not found.");
+                    Restaurant restaurantToUpdate = managementSystem.getRestaurant(restaurantIdToUpdate);
+
+                    //if the restaurant doesn't exist
+                    if (restaurantToUpdate == null) {
+                        System.out.println("Restaurant ID " + restaurantIdToUpdate + " not found.");
+                        break; // Safely exit case 4 and return to admin dashboard
                     }
+
+                    // 3. If it exists, proceed with gathering updates directly from the reference object
+                    System.out.print("Enter new name (Current: " + restaurantToUpdate.getRestaurantName() + "): ");
+                    String newRestaurantName = scanner.nextLine().trim();
+                    
+                    System.out.println("Choose new location (Current: " + restaurantToUpdate.getLocationNode() + "): ");
+                    int k = 1;
+                    for (String loc : myMap.getLocations()) {
+                        System.out.println(k + ". " + loc);
+                        k++;
+                    }
+                    System.out.println("Select a new location by number: ");
+                    int newlocationChoice = scanner.nextInt();
+                    scanner.nextLine(); // Consume the newline
+                    String newLocation = myMap.getLocations().get(newlocationChoice - 1);
+
+                    
+                    System.out.print("Enter new category (Current: " + restaurantToUpdate.getFoodCategory() + "): ");
+                    String newFoodCategory = scanner.nextLine().trim();
+
+                    // 4. Commit the modifications to the data models and persist to file
+                    restaurantToUpdate.setRestaurantName(newRestaurantName);
+                    restaurantToUpdate.setLocationNode(newLocation);
+                    restaurantToUpdate.setFoodCategory(newFoodCategory);
+                    
+                    managementSystem.saveRestaurantsToFile();
+                    System.out.println("Restaurant " + restaurantIdToUpdate + " details updated successfully.");
                     break;
 
                 case 5:
@@ -616,6 +654,10 @@ public class MainApplication {
                     System.out.print("Enter restaurant ID to update menu:");
                     String restaurantIdToUpdateMenu = scanner.nextLine().trim();
                     Restaurant restaurantToUpdateMenu = managementSystem.getRestaurant(restaurantIdToUpdateMenu);
+                    if (restaurantToUpdateMenu == null) {
+                        System.out.println("Restaurant ID " + restaurantIdToUpdateMenu + " not found.");
+                        break;
+                    }
                     System.out.println("1. Adding new food item to " + restaurantToUpdateMenu.getRestaurantName() + "'s menu.");
                     System.out.println("2. Removing food item from " + restaurantToUpdateMenu.getRestaurantName() + "'s menu.");
                     System.out.print("Select option (1-2): ");
@@ -662,13 +704,13 @@ public class MainApplication {
                                 System.out.println("Food item not found in the menu.");
                             }
                             break;
+                    }
                 case 6:
                     // Implement user account management logic here
                     System.out.print("Remove user account by ID: ");
                     String userIdToRemove = scanner.nextLine().trim();
                     if (managementSystem.getUser(userIdToRemove) != null) {
                         managementSystem.removeUser(userIdToRemove);
-                        System.out.println("User ID " + userIdToRemove + " has been removed.");
                     } else {
                         System.out.println("User ID not found.");
                     }
@@ -687,7 +729,6 @@ public class MainApplication {
                 default:
                     System.out.println("Invalid choice! Select 1-8.");
             }
-        }
         }
     }
 }

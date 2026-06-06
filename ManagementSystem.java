@@ -62,6 +62,10 @@ public class ManagementSystem {
         return restaurantIndex.get(restaurantID);
     }
 
+    public List<Restaurant> getAllRestaurants() {
+        return restaurantList;
+    }
+
     // Inside ManagementSystem.java
     public List<Restaurant> searchRestaurantsByKeyword(String keyword) {
         List<Restaurant> matchingRestaurants = new ArrayList<>();
@@ -206,8 +210,8 @@ public class ManagementSystem {
         // Add user if no duplication
         userList.add(user);
         userIndex.put(user.getUserID(), user);
-        System.out.println("User '" + user.getUserName() + "' added successfully.");
-
+        System.out.println("Welcome, User '" + user.getUserName() + "'!");
+        
         saveUsersToFile();
     }
 
