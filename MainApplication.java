@@ -178,7 +178,7 @@ public class MainApplication {
             System.out.println("\n--- GOODTECH CUSTOMER PORTAL ---");
             System.out.println("1. Displaying all available restaurants");
             System.out.println("2. Search Food or Restaurant by Name/ID and add items to Cart");
-            System.out.println("3. View Shopping Cart & Manage Orders");
+            System.out.println("3. View Shopping Cart");
             System.out.println("4. Undo Last Item Added to Cart");
             System.out.println("5. Confirm Order & Checkout");
             System.out.println("6. Track Active Order & Route Map");
@@ -261,7 +261,7 @@ public class MainApplication {
                                 }
                                 restaurantID = chosenID;
                                 System.out.println(
-                                        "🗑️ Cart cleared. Switched to: " + selectedRestaurant.getRestaurantName());
+                                        "Cart cleared. Switched to: " + selectedRestaurant.getRestaurantName());
                             } else {
                                 System.out.println("Returning to results list...");
                                 continue; // Skips the menu loading and loops back to the list selection
@@ -387,7 +387,7 @@ public class MainApplication {
                     System.out.println("Order Summary:");
                     cartStack.displayCart();
                     System.out.printf("Your current order total is: RM %.2f\n", cartStack.calculateTotal());
-                    System.out.println("Are you sure you want to confirm your order? (Y/N): ");
+                    System.out.print("Are you sure you want to confirm your order? (Y/N): ");
                     String confirm = scanner.nextLine().trim();
                     if (confirm.equalsIgnoreCase("Y")) {
                         System.out.println("\nSubmitting order to Processing Queue...");
@@ -403,22 +403,6 @@ public class MainApplication {
                         System.out.println("Matching optimal rider and path...");
 
                         String restaurantLocNode = managementSystem.getRestaurant(restaurantID).getLocationNode();
-
-                        // DEBUG
-                        // System.out.println("\n===== RIDER DISTANCES =====");
-
-                        // for (Rider r : deliveryScheduler.getRegisteredRiders()) {
-
-                        // double distance =
-                        // nav.calculateShortestPath(
-                        // r.getCurrentLocation(),
-                        // restaurantLocNode
-                        // );
-
-                        // System.out.println(
-                        // r.getRiderName() + " distance = " + distance
-                        // );
-                        // }
 
                         DeliveryScheduler checkoutMatchEngine = new DeliveryScheduler(restaurantLocNode, nav);
 
@@ -732,7 +716,7 @@ public class MainApplication {
                         orderQueue.processNextOrder(); 
                     }
                     break;
-                    
+
                 case 7:
                     // Implement user account management logic here
                     System.out.print("Remove user account by ID: ");

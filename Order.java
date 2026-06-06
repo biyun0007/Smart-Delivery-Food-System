@@ -47,6 +47,6 @@ public class Order {
                 "\nCustomer   : " + customer.getUserName() +
                 "\nRestaurant : " + restaurant.getRestaurantName() +
                 "\nItems      : " + items +
-                "\nTotal      : $" + calculateTotal();
+                "\nTotal      : RM" + calculateTotal();
     }
 }
