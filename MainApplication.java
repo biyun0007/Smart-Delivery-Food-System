@@ -44,7 +44,7 @@ public class MainApplication {
         myMap.addRoad("KL Gate", "KL Gateway Mall", 1.8, false);
         myMap.addRoad("KL Gateway Mall", "Mid Valley Megamall", 2.0, false);
         myMap.addRoad("KL Gateway Mall", "KFC University", 4.0, false);
-        myMap.addRoad("KL Gateway Mall", "KL Gate", 3.7, false);
+        myMap.addRoad("KL Gateway Mall", "PJ Gate", 3.7, false);
         myMap.addRoad("PJ Gate", "KFC University", 1.0, false);
 
         nav = new NavigationSystem(myMap);
@@ -431,7 +431,7 @@ public class MainApplication {
                         assignedRider = checkoutMatchEngine.assignBestRider();
                         if (assignedRider != null) {
                             System.out.println(
-                                    "Successfully assigned " + assignedRider.getRiderName() + " to your order!");
+                                    "Successfully assigned " + assignedRider.getRiderName() +"with rating " + assignedRider.getRating() + " to your order!");
                         }
                     } else {
                         System.out.println("Checkout cancelled. Returning to main menu.");
@@ -688,23 +688,26 @@ public class MainApplication {
                             System.out.print("Enter the name of the food item to remove: ");
                             String itemNameToRemove = scanner.nextLine().trim();
                             List<FoodItem> menuItems = restaurantToUpdateMenu.getMenuItems();
-                            boolean itemFound = false;
+                            FoodItem itemToDelete = null;
 
+                            // Step 1: Scan safely to find the matching item without altering the list size mid-flight
                             for (FoodItem item : menuItems) {
                                 if (item.getFoodName().equalsIgnoreCase(itemNameToRemove)) {
-                                    menuItems.remove(item);
-                                    restaurantToUpdateMenu.getMenuItems().remove(item);
-                                    managementSystem.saveAllMenuItemsToFile(); // Rewrite the entire menu file to reflect the deletion
-                                    System.out.println("'" + itemNameToRemove + "' has been removed from "+ restaurantToUpdateMenu.getRestaurantName() + "'s menu.");
-                                    itemFound = true;
-                                    break;
+                                    itemToDelete = item; // Store the reference pointer
+                                    break; // Exit the loop safely now that a match is recorded
                                 }
                             }
-                            if (!itemFound) {
+
+                            // Step 2: Execute modification outside the loop context
+                            if (itemToDelete != null) {
+                                menuItems.remove(itemToDelete); // Remove it once cleanly from the reference list
+                                managementSystem.saveAllMenuItemsToFile(); // Rewrite the menu file to match changes
+                                System.out.println("'" + itemNameToRemove + "' has been removed from " + restaurantToUpdateMenu.getRestaurantName() + "'s menu.");
+                            } else {
                                 System.out.println("Food item not found in the menu.");
                             }
                             break;
-                    }
+                    }break;
                 case 6:
                     // Implement user account management logic here
                     System.out.print("Remove user account by ID: ");
@@ -729,6 +732,7 @@ public class MainApplication {
                 default:
                     System.out.println("Invalid choice! Select 1-8.");
             }
+    
         }
     }
 }
