@@ -723,7 +723,7 @@ public class MainApplication {
                     orderQueue.displayActiveOrders(); 
                     
                     // 2. Ask the admin if they want to process the next order in line
-                    System.out.print("\nWould you like to process and cook the next order in the queue? (Y/N): ");
+                    System.out.print("\nWould you like to process the next order in the queue? (Y/N): ");
                     String processConfirm = scanner.nextLine().trim();
                     
                     if (processConfirm.equalsIgnoreCase("Y")) {
@@ -732,6 +732,7 @@ public class MainApplication {
                         orderQueue.processNextOrder(); 
                     }
                     break;
+                    
                 case 7:
                     // Implement user account management logic here
                     System.out.print("Remove user account by ID: ");
