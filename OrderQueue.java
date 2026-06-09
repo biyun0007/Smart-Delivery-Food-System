@@ -20,8 +20,7 @@ public class OrderQueue {
     public Order processNextOrder() {
 
         if (!activeOrders.isEmpty()) {
-            Order processing =
-                    activeOrders.poll();
+            Order processing = activeOrders.poll();
             System.out.println("Processing Order: " + processing.getOrderID());
             return processing;
 

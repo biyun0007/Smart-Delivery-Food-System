@@ -85,7 +85,7 @@ public class NavigationSystem {
             return;
         }
 
-        System.out.println("\n[Rider is Out For Delivery!");
+        System.out.println("\n[Rider is Out For Delivery!]");
 
         // 1. Grab our custom head node to begin traversing the chain
         Node<String> current = shortestPath.getHead();

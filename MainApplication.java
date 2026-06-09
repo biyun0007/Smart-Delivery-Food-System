@@ -190,10 +190,10 @@ public class MainApplication {
         // check if user wants to change delivery location
         String userLocation = managementSystem.getUser(userID).getUserAddressNode();
         System.out.println("Delivery location set to: " + userLocation);
-        System.out.print("Change delivery location? (Y/N): ");
-        String changeLocation = scanner.next().trim();
+        System.out.print("Change delivery location? ('Y' for Yes/N for No): ");
+        char changeLocation = scanner.next().trim().charAt(0);
         scanner.nextLine();
-        if (changeLocation.equalsIgnoreCase("Y")) {
+        if (changeLocation == 'Y' || changeLocation == 'y') {
             int i = 1;
             for (String loc : myMap.getLocations()) {
                 System.out.println(i + ". " + loc);
@@ -210,6 +210,10 @@ public class MainApplication {
             } else {
                 System.out.println("Invalid selection. Keeping current location.");
             }
+        }else if (changeLocation == 'N' || changeLocation == 'n') {
+            System.out.println("Keeping current delivery location: " + userLocation);
+        } else {
+            System.out.println("Invalid input. Keeping current delivery location: " + userLocation);
         }
 
         // menu for customer portal
@@ -219,7 +223,7 @@ public class MainApplication {
 
         while (inCustomerMenu) {
             System.out.println("\n--- GOODTECH CUSTOMER PORTAL ---");
-            System.out.println("1. Displaying all available restaurants");
+            System.out.println("1. Display all available restaurants");
             System.out.println("2. Search Food or Restaurant by Name/ID and add items to Cart");
             System.out.println("3. View Shopping Cart");
             System.out.println("4. Undo Last Item Added to Cart");
@@ -245,7 +249,7 @@ public class MainApplication {
                     break;
 
                 case 2:
-                    System.out.print("\nEnter Restaurant Name, Location, or Cuisine keyword: ");
+                    System.out.print("\nEnter Restaurant Name, ID, Location or Cuisine keyword: ");
                     String searchTerm = scanner.nextLine().trim();
                     if (searchTerm.isEmpty()) {
                         System.out.println("Showing all restaurants:");
@@ -534,6 +538,17 @@ public class MainApplication {
 
                     restaurantID = null;
                     orderPlaced = false;
+
+                    System.out.println("Return to main menu or logout? (M/L): ");
+                    String choices = scanner.nextLine().trim().toUpperCase();
+                    if (choices.equals("M")) {
+                        inCustomerMenu = true;
+                        System.out.println("Returning to main menu...");
+                    } else if (choices.equals("L")) {
+                        inCustomerMenu = false;
+                    }else {
+                        System.out.println("Invalid choice. Returning to main menu by default.");
+                    }
                     break;
 
                 case 7:
@@ -542,8 +557,7 @@ public class MainApplication {
                     break;
 
                 case 8:
-                    System.out.println(
-                            "Are you sure you want to delete your account? This action cannot be undone. (Y/N): ");
+                    System.out.println("Are you sure you want to delete your account? This action cannot be undone. (Y/N): ");
                     String deleteConfirm = scanner.nextLine().trim();
                     if (deleteConfirm.equalsIgnoreCase("Y")) {
                         managementSystem.removeUser(userID);
