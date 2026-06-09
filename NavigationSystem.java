@@ -138,6 +138,10 @@ public class NavigationSystem {
         // 5. Final success message using data pointers
         // Find the very last location name by scanning to the end node
         Node<String> finalNode = shortestPath.getHead();
+        if (finalNode == null) {
+            System.out.println("Order cancelled. Could not find a valid path route. Your refund will be processed within 3 working days.");
+            return;
+        }
         while (finalNode != null && finalNode.next != null) {
             finalNode = finalNode.next;
         }

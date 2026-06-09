@@ -377,26 +377,38 @@ public class MainApplication {
                                     break;
 
                                 case 3:
-                                    System.out.println(
-                                            "\nEnter the EXACT Food Name to add to your cart (or type 'done' to finish):");
-                                    while (true) {
+                                    System.out.println("\nEnter the EXACT Food Name to add to your cart:");
+                                    boolean addingItems = true;
+                                    while (addingItems) {
                                         System.out.print("Item name: ");
                                         String foodName = scanner.nextLine().trim();
-                                        if (foodName.equalsIgnoreCase("done")) {
-                                            System.out.println("Finished adding items to cart.");
-                                            break;
-                                        }
 
                                         // Look up via exact name mapping rules (O(log n) efficiency check)
                                         FoodItem itemToAdd = menuSystem.searchByName(foodName);
 
                                         if (itemToAdd != null) {
                                             cartStack.addItem(new OrderItem(itemToAdd));
-                                            System.out.printf("Current cart total: RM %.2f\n",
-                                                    cartStack.calculateTotal());
+                                            System.out.printf("Current cart total: RM %.2f\n", cartStack.calculateTotal());
                                         } else {
                                             System.out.println(
                                                     "Item not found. Please verify spelling from the A-Z menu selection.");
+                                        }
+
+                                        // Prompt the user explicitly if they want to keep adding items
+                                        while (true) {
+                                            System.out.print("\nDo you want to continue adding food items? (Y/N): ");
+                                            String userChoice = scanner.nextLine().trim();
+                                            
+                                            if (userChoice.equalsIgnoreCase("N")) {
+                                                System.out.println("Finished adding items to cart.");
+                                                addingItems = false; // Flag to exit the primary item adding loop
+                                                break;               // Break out of this validation loop
+                                            } else if (userChoice.equalsIgnoreCase("Y")) {
+                                                System.out.println(); 
+                                                break;
+                                            } else {
+                                                System.out.println("Invalid input! Please enter 'Y' for Yes or 'N' for No.");
+                                            }
                                         }
                                     }
                                     break;
@@ -443,8 +455,7 @@ public class MainApplication {
                         break;
                     }
                     System.out.println("\n--- ORDER CONFIRMATION ---");
-                    System.out.println("You are about to place an order from: "
-                            + managementSystem.getRestaurant(restaurantID).getRestaurantName());
+                    System.out.println("You are about to place an order from: " + managementSystem.getRestaurant(restaurantID).getRestaurantName());
                     System.out.printf("Delivery Location: %s\n", managementSystem.getUser(userID).getUserAddressNode());
                     System.out.println("\n  Order Summary");
                     cartStack.displayCart();
@@ -461,8 +472,7 @@ public class MainApplication {
                         orderPlaced = true;
                         System.out.println("Order confirmed and added to processing queue!");
                         System.out.println("Your order id is: " + newOrder.getOrderID());
-                        System.out
-                                .println("Your order is being prepared. You can track it once it's out for delivery.");
+                        System.out.println("Your order is being prepared. You can track it once it's out for delivery.");
                         // Assign delivery rider and calculate delivery route
                         System.out.println("Matching optimal rider and path...");
 
@@ -479,8 +489,7 @@ public class MainApplication {
                         assignedRider = checkoutMatchEngine.assignBestRider();
                         if (assignedRider != null) {
                             System.out.println(
-                                    "Successfully assigned " + assignedRider.getRiderName() + " with rating "
-                                            + assignedRider.getRating() + " to your order!");
+                                    "Successfully assigned " + assignedRider.getRiderName() + " with rating " + assignedRider.getRating() + " to your order!");
                         } else {
                             System.out.println("No rider available at the moment.");
                         }
@@ -491,7 +500,7 @@ public class MainApplication {
 
                 case 6:
                     if (restaurantID == null || !orderPlaced) {
-                        System.out.println("No active order found. Please checkout first (option 5).");
+                        System.out.println("No active order found. Please checkout first (Option 5).");
                         break;
                     }
 
@@ -505,11 +514,10 @@ public class MainApplication {
                     System.out.println("       ACTIVE ORDER LIVE TRACKING        ");
                     System.out.println("=========================================");
                     System.out.println("Customer Profile : " + managementSystem.getUser(userID).getUserName());
-                    System.out.println("Dispatch From    : " + currentRest.getRestaurantName() + " ("
-                            + currentRest.getLocationNode() + ")");
+                    System.out.println("Dispatch From    : " + currentRest.getRestaurantName() + " ("+ currentRest.getLocationNode() + ")");
                     System.out.println("Destination Node : " + userLocation);
                     System.out.println("Assigned Courier : "
-                            + (assignedRider != null ? assignedRider.getRiderName() : "Searching..."));
+                            + (assignedRider != null ? assignedRider.getRiderName() + " (Rating: " + assignedRider.getRating() + ")" : "Searching..."));
                     nav.calculateShortestPath(managementSystem.getRestaurant(restaurantID).getLocationNode(),
                             userLocation);
                     nav.simulateDeliveryRoute(nav.finalRoute, myMap);
@@ -517,8 +525,7 @@ public class MainApplication {
                     if (assignedRider != null) {
                         int rating = 0;
                         while (rating < 1 || rating > 5) {
-                            System.out.print("Rate your delivery experience with " + assignedRider.getRiderName()
-                                    + " (1-5 stars): ");
+                            System.out.print("Rate your delivery experience with " + assignedRider.getRiderName() + " (1-5 stars): ");
                             if (!scanner.hasNextInt()) {
                                 System.out.println("Invalid input! Please enter a number 1-5.");
                                 scanner.nextLine();
@@ -539,7 +546,7 @@ public class MainApplication {
                     restaurantID = null;
                     orderPlaced = false;
 
-                    System.out.println("Return to main menu or logout? (M/L): ");
+                    System.out.print("Return to main menu or logout? (M/L): ");
                     String choices = scanner.nextLine().trim().toUpperCase();
                     if (choices.equals("M")) {
                         inCustomerMenu = true;
@@ -567,7 +574,26 @@ public class MainApplication {
                         System.out.println("Account deletion cancelled. Returning to main menu.");
                     }
                     break;
+
                 case 9:
+                    if (orderPlaced){
+                        System.out.println("You are not allowed to change delivery location before your order is completed.");
+                        break;
+                    }
+                    if(restaurantID != null || !cartStack.isEmpty() ) {
+                        System.out.print("Changing delivery will clear your current cart and reset your restaurant selection. Do you want to proceed? (Y/N): ");
+                        String proceed = scanner.nextLine().trim();
+                        if (!proceed.equalsIgnoreCase("Y")) {
+                            System.out.println("Change delivery location cancelled. Returning to main menu.");
+                            break;
+                        } else {
+                            restaurantID = null;
+                            while (!cartStack.isEmpty()) {
+                                    cartStack.undoLastItem();
+                                }
+                            System.out.println("Cart cleared and restaurant selection reset.");
+                        }
+                    }
                     // Change delivery location
                     System.out.println("\nCurrent delivery location: " + userLocation);
                     int index = 1;
