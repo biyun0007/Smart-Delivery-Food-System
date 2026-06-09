@@ -39,27 +39,28 @@ public class ManagementSystem {
     // Restaurant Management
     public void addRestaurant(Restaurant restaurant) {
         restaurantList.add(restaurant);
-        restaurantIndex.put(restaurant.getRestaurantID(), restaurant);
+        restaurantIndex.put(restaurant.getRestaurantID().toUpperCase(), restaurant);
         System.out.println("Restaurant '" + restaurant.getRestaurantName() + "' with id " + restaurant.getRestaurantID()
                 + " added successfully.");
         saveRestaurantsToFile();
     }
 
     public void removeRestaurant(String restaurantID) {
-        Restaurant res = restaurantIndex.get(restaurantID);
+        Restaurant res = restaurantIndex.get(restaurantID.toUpperCase());
         if (res != null) {
             restaurantList.remove(res);
-            restaurantIndex.remove(restaurantID);
+            restaurantIndex.remove(restaurantID.toUpperCase());
             System.out.println("Restaurant ID " + restaurantID + " removed.");
         } else {
             System.out.println("Restaurant not found.");
         }
         saveRestaurantsToFile();
+        saveAllMenuItemsToFile();
     }
 
     // Restaurant management
     public Restaurant getRestaurant(String restaurantID) {
-        return restaurantIndex.get(restaurantID);
+        return restaurantIndex.get(restaurantID.toUpperCase());
     }
 
     public List<Restaurant> getAllRestaurants() {
@@ -118,7 +119,7 @@ public class ManagementSystem {
                     String foodCategory = parts[3].trim();
                     Restaurant restaurant = new Restaurant(restaurantId, restaurantName, location, foodCategory);
                     restaurantList.add(restaurant);
-                    restaurantIndex.put(restaurantId, restaurant);
+                    restaurantIndex.put(restaurantId.toUpperCase(), restaurant);
                 }
             }
         } catch (IOException e) {
@@ -194,8 +195,12 @@ public class ManagementSystem {
 
     // User Management
     public boolean addUser(User user) {
+        String upperID = user.getUserID().toUpperCase();
+        if (userIndex.containsKey(upperID)) {
+            return false;
+        }
         userList.add(user);
-        userIndex.put(user.getUserID(), user);
+        userIndex.put(upperID, user);
         System.out.println("Welcome, User '" + user.getUserName() + "'!");
         saveUsersToFile();
         return true;
@@ -205,12 +210,12 @@ public class ManagementSystem {
     public boolean hasDuplicatePhoneNumber(String phoneNumber) {
         for (User existingUser : userList) {
             if (existingUser.getUserPhoneNumber().equals(phoneNumber)) {
-                System.out.println("\n[Registration Error] Phone number '" + phoneNumber 
+                System.out.println("\n[Registration Error] Phone number '" + phoneNumber
                         + "' is already registered under the name '" + existingUser.getUserName() + "'.");
                 return true; // Duplicate found
             }
         }
-        return false; 
+        return false;
     }
 
     public void removeUser(String userID) {
@@ -226,7 +231,7 @@ public class ManagementSystem {
     }
 
     public User getUser(String id) {
-        return userIndex.get(id);
+        return userIndex.get(id.toUpperCase());
     }
 
     public void displayAllUsers() {
@@ -272,7 +277,7 @@ public class ManagementSystem {
                     User user = new User(id, name, phone, location, password);
 
                     userList.add(user);
-                    userIndex.put(id, user);
+                    userIndex.put(id.toUpperCase(), user);
                 }
             }
         } catch (IOException e) {
@@ -330,7 +335,7 @@ public class ManagementSystem {
                     String password = parts[2].trim();
                     Admin admin = new Admin(adminId, adminName, password);
                     adminList.add(admin);
-                    adminIndex.put(adminId, admin);
+                    adminIndex.put(adminId.toUpperCase(), admin);
                 }
             }
         } catch (IOException e) {

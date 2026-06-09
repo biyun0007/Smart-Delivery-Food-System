@@ -1,4 +1,5 @@
 import java.util.*;
+import java.util.Collections;
 
 class Edge {
     String target;
@@ -28,13 +29,19 @@ public class CityMap {
     public Map<String, List<Edge>> getAdjacencyList() {
         return adjacencyList;
     }
-    
+
     public List<String> getLocations() {
-        return new ArrayList<>(adjacencyList.keySet()); 
+        List<String> locs = new ArrayList<>(adjacencyList.keySet());
+        Collections.sort(locs);
+        return locs;
     }
 
     public List<Edge> getRoadsFrom(String location) {
-        return adjacencyList.get(location) == null ? new ArrayList<>() : adjacencyList.get(location);    //return the list of roads (edges) from a given location [destination,distance]
+        return adjacencyList.get(location) == null ? new ArrayList<>() : adjacencyList.get(location); // return the list
+                                                                                                      // of roads
+                                                                                                      // (edges) from a
+                                                                                                      // given location
+                                                                                                      // [destination,distance]
     }
 
 }

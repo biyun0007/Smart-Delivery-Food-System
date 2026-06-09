@@ -133,6 +133,10 @@ public class MainApplication {
                     System.out.print("Select a location by number: ");
                     int locationChoice = scanner.nextInt();
                     scanner.nextLine(); // Consume the trailing newline
+                    if (locationChoice < 1 || locationChoice > myMap.getLocations().size()) {
+                        System.out.println("Invalid selection.");
+                        break;
+                    }
                     userLocation = myMap.getLocations().get(locationChoice - 1);
 
                     // Password Construction and Match Verification Loop
@@ -179,6 +183,9 @@ public class MainApplication {
             }
         } while (true);
 
+        cartStack = new OrderCart();
+        assignedRider = null;
+
         // Now runCustomerPortal will never receive a null user profile!
         // check if user wants to change delivery location
         String userLocation = managementSystem.getUser(userID).getUserAddressNode();
@@ -207,6 +214,7 @@ public class MainApplication {
 
         // menu for customer portal
         String restaurantID = null;
+        boolean orderPlaced = false;
         boolean inCustomerMenu = true;
 
         while (inCustomerMenu) {
@@ -239,6 +247,11 @@ public class MainApplication {
                 case 2:
                     System.out.print("\nEnter Restaurant Name, Location, or Cuisine keyword: ");
                     String searchTerm = scanner.nextLine().trim();
+                    if (searchTerm.isEmpty()) {
+                        System.out.println("Showing all restaurants:");
+                        managementSystem.displayAllRestaurants();
+                        break;
+                    }
 
                     // 1. Get and store all partial keyword matches from the database
                     List<Restaurant> matches = managementSystem.searchRestaurantsByKeyword(searchTerm);
@@ -269,6 +282,11 @@ public class MainApplication {
                             System.out.printf("[%d] Exit Search & Return to Main Portal\n", (matches.size() + 1));
 
                             System.out.print("Select a restaurant number: ");
+                            if (!scanner.hasNextInt()) {
+                                System.out.println("Invalid input! Please enter a number.");
+                                scanner.nextLine();
+                                continue;
+                            }
                             int restNum = scanner.nextInt();
                             scanner.nextLine(); // Clear buffer
 
@@ -324,7 +342,11 @@ public class MainApplication {
                             System.out.println("4. Back to Shop List Results");
                             System.out.println("5. Back to Main Menu");
                             System.out.print("Select option (1-5): ");
-
+                            if (!scanner.hasNextInt()) {
+                                System.out.println("Invalid input! Please enter a number.");
+                                scanner.nextLine();
+                                continue;
+                            }
                             int menuChoice = scanner.nextInt();
                             scanner.nextLine(); // Clean input stream buffer
 
@@ -393,7 +415,7 @@ public class MainApplication {
                     break;
 
                 case 3:
-                    System.out.println("\nDisplaying Cart.");
+                    System.out.println("\n  [Current Cart]");
                     cartStack.displayCart();
                     break;
 
@@ -420,7 +442,7 @@ public class MainApplication {
                     System.out.println("You are about to place an order from: "
                             + managementSystem.getRestaurant(restaurantID).getRestaurantName());
                     System.out.printf("Delivery Location: %s\n", managementSystem.getUser(userID).getUserAddressNode());
-                    System.out.println("Order Summary:");
+                    System.out.println("\n  Order Summary");
                     cartStack.displayCart();
                     System.out.printf("Your current order total is: RM %.2f\n", cartStack.calculateTotal());
                     System.out.print("Are you sure you want to confirm your order? (Y/N): ");
@@ -432,6 +454,7 @@ public class MainApplication {
                                 managementSystem.getRestaurant(restaurantID), cartStack.confirmOrder());
 
                         orderQueue.receiveOrder(newOrder);
+                        orderPlaced = true;
                         System.out.println("Order confirmed and added to processing queue!");
                         System.out.println("Your order id is: " + newOrder.getOrderID());
                         System.out
@@ -454,6 +477,8 @@ public class MainApplication {
                             System.out.println(
                                     "Successfully assigned " + assignedRider.getRiderName() + " with rating "
                                             + assignedRider.getRating() + " to your order!");
+                        } else {
+                            System.out.println("No rider available at the moment.");
                         }
                     } else {
                         System.out.println("Checkout cancelled. Returning to main menu.");
@@ -461,8 +486,8 @@ public class MainApplication {
                     break;
 
                 case 6:
-                    if (restaurantID == null) {
-                        System.out.println("No active order found. Please place an order first.");
+                    if (restaurantID == null || !orderPlaced) {
+                        System.out.println("No active order found. Please checkout first (option 5).");
                         break;
                     }
 
@@ -486,10 +511,21 @@ public class MainApplication {
                     nav.simulateDeliveryRoute(nav.finalRoute, myMap);
                     System.out.println("Your order has been delivered! Thank you for using GOODTECH.");
                     if (assignedRider != null) {
-                        System.out.print("Rate your delivery experience with " + assignedRider.getRiderName()
-                                + " (1-5 stars): ");
-                        int rating = scanner.nextInt();
-                        scanner.nextLine();
+                        int rating = 0;
+                        while (rating < 1 || rating > 5) {
+                            System.out.print("Rate your delivery experience with " + assignedRider.getRiderName()
+                                    + " (1-5 stars): ");
+                            if (!scanner.hasNextInt()) {
+                                System.out.println("Invalid input! Please enter a number 1-5.");
+                                scanner.nextLine();
+                                continue;
+                            }
+                            rating = scanner.nextInt();
+                            scanner.nextLine();
+                            if (rating < 1 || rating > 5) {
+                                System.out.println("Invalid rating! Please enter between 1 and 5.");
+                            }
+                        }
                         deliveryScheduler.rateRider(assignedRider, rating);
                         deliveryScheduler.setRiderLocation(assignedRider, userLocation);
                     } else {
@@ -497,6 +533,7 @@ public class MainApplication {
                     }
 
                     restaurantID = null;
+                    orderPlaced = false;
                     break;
 
                 case 7:
@@ -554,7 +591,7 @@ public class MainApplication {
 
     public static void runRestaurantPortal(Scanner scanner) {
         System.out.print("Please enter your admin ID to log in: ");
-        String adminID = scanner.next();
+        String adminID = scanner.next().toUpperCase();
         if (managementSystem.getAdmin(adminID) == null) {
             System.out.println("Admin ID " + adminID + " not found. Please try again.");
             return;
@@ -612,6 +649,10 @@ public class MainApplication {
                     System.out.print("Select a location by number: ");
                     int locationChoice = scanner.nextInt();
                     scanner.nextLine(); // Consume the newline
+                    if (locationChoice < 1 || locationChoice > myMap.getLocations().size()) {
+                        System.out.println("Invalid selection.");
+                        break;
+                    }
                     String location = myMap.getLocations().get(locationChoice - 1);
 
                     System.out.print("Enter food category: ");
@@ -669,6 +710,10 @@ public class MainApplication {
                     System.out.println("Select a new location by number: ");
                     int newlocationChoice = scanner.nextInt();
                     scanner.nextLine(); // Consume the newline
+                    if (newlocationChoice < 1 || newlocationChoice > myMap.getLocations().size()) {
+                        System.out.println("Invalid selection.");
+                        break;
+                    }
                     String newLocation = myMap.getLocations().get(newlocationChoice - 1);
 
                     System.out.print("Enter new category (Current: " + restaurantToUpdate.getFoodCategory() + "): ");
@@ -698,6 +743,11 @@ public class MainApplication {
                     System.out.println(
                             "2. Removing food item from " + restaurantToUpdateMenu.getRestaurantName() + "'s menu.");
                     System.out.print("Select option (1-2): ");
+                    if (!scanner.hasNextInt()) {
+                        System.out.println("Invalid input! Please enter 1 or 2.");
+                        scanner.nextLine();
+                        break;
+                    }
                     int menuUpdateChoice = scanner.nextInt();
                     scanner.nextLine(); // Consume the newline character
 
@@ -788,7 +838,7 @@ public class MainApplication {
                     break;
 
                 default:
-                    System.out.println("Invalid choice! Select 1-8.");
+                    System.out.println("Invalid choice! Select 1-9.");
             }
 
         }

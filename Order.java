@@ -6,7 +6,7 @@ public class Order {
     private Restaurant restaurant;
     private List<OrderItem> items;
 
-    public Order(User customer,Restaurant restaurant,List<OrderItem> items) {
+    public Order(User customer, Restaurant restaurant, List<OrderItem> items) {
         this.orderID = "ORD" + System.currentTimeMillis(); // Simple unique ID generation
         this.customer = customer;
         this.restaurant = restaurant;
@@ -41,12 +41,37 @@ public class Order {
 
     @Override
     public String toString() {
+        // Group items by name for quantity display
+        java.util.LinkedHashMap<String, int[]> grouped = new java.util.LinkedHashMap<>();
+        for (OrderItem item : items) {
+            if (grouped.containsKey(item.getFoodName())) {
+                grouped.get(item.getFoodName())[0]++;
+                grouped.get(item.getFoodName())[1] += (int) (item.getPrice() * 100);
+            } else {
+                grouped.put(item.getFoodName(), new int[] { 1, (int) (item.getPrice() * 100) });
+            }
+        }
+
+        StringBuilder itemLines = new StringBuilder();
+        boolean first = true;
+        for (java.util.Map.Entry<String, int[]> entry : grouped.entrySet()) {
+            String line = String.format("%-25s x%-2d RM%.2f",
+                    entry.getKey(),
+                    entry.getValue()[0],
+                    entry.getValue()[1] / 100.0);
+            if (first) {
+                itemLines.append(line);
+                first = false;
+            } else {
+                itemLines.append("\n             ").append(line);
+            }
+        }
 
         return "\n[Order Details]" +
                 "\nOrder ID   : " + orderID +
                 "\nCustomer   : " + customer.getUserName() +
                 "\nRestaurant : " + restaurant.getRestaurantName() +
-                "\nItems      : " + items +
-                "\nTotal      : RM" + calculateTotal();
+                "\nItems      : " + itemLines.toString() +
+                "\nTotal      : RM" + String.format("%.2f", calculateTotal());
     }
 }
