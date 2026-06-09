@@ -7,7 +7,7 @@ public class Order {
     private List<OrderItem> items;
 
     public Order(User customer, Restaurant restaurant, List<OrderItem> items) {
-        this.orderID = "ORD" + System.currentTimeMillis(); // Simple unique ID generation
+        this.orderID = "ORD" + System.currentTimeMillis() + "-" + (int)(Math.random()*1000);// Simple unique ID generation
         this.customer = customer;
         this.restaurant = restaurant;
         this.items = items;

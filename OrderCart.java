@@ -37,7 +37,8 @@ public class OrderCart {
     public List<OrderItem> confirmOrder() {
         List<OrderItem> finalizedItems = new ArrayList<>();
         while (!cart.isEmpty()) {
-            finalizedItems.add(cart.pop());
+            finalizedItems.addAll(cart); 
+            cart.clear();
         }
         return finalizedItems;
     }
