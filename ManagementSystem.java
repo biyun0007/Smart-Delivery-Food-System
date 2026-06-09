@@ -226,12 +226,7 @@ public class ManagementSystem {
     }
 
     public User getUser(String id) {
-        for (User u : userList) {
-            if (u.getUserID().equals(id)) {
-                return u; 
-            }
-        }
-        return null;
+        return userIndex.get(id);
     }
 
     public void displayAllUsers() {
